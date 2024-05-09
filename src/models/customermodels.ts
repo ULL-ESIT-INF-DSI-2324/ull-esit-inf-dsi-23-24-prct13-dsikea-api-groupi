@@ -7,13 +7,24 @@ connect('mongodb://127.0.0.1:27017/customer').then(() => {
   console.log('Something went wrong when conecting to the database');
 });
 
+/**
+ * @brief Esquema de la base de datos de cliente
+ * nombre: Nombre del cliente
+ * id: Identificador del cliente
+ * correo: Correo del cliente
+ * direccion: Dirección del cliente
+ */
 interface Customeinterface extends Document {
   nombre: string,
   dni: string,
-  email: string,
+  correo: string,
   contacto: number
 }
 
+
+/**
+ * Esquema de la colección de 
+ */
 const CustomerSchema = new Schema<Customeinterface>({
   nombre: {
     type: String,
@@ -45,7 +56,7 @@ const CustomerSchema = new Schema<Customeinterface>({
       }
     }
   },
-  email: {
+  correo: {
     type: String,
     required: true,
     validate: {

@@ -18,14 +18,14 @@ connect('mongodb://127.0.0.1:27017/providers').then(() => {
 export interface ProviderInterface extends Document  {
     cif: string,
     nombre: string,
-    correo: string
+    correo: string,
     direccion: string,
 }
 
 /**
- * @brief 
+ * @brief Esquema de la colección de proveedores
  */
-export const ProviderSchema: Schema = new Schema <ProvideInterface>({
+export const ProviderSchema: Schema = new Schema <ProviderInterface>({
 
 });
 
