@@ -5,10 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "coverage": "c8 npm test && c8 report --reporter=lcov",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc-watch --onSuccess \"env-cmd -f ./config/dev.env node dist/index.js\"",
     "doc": "typedoc",
-    "test": "mocha",
-    "server": "tsc; node dist/server.js &"
+    "test": "env-cmd -f ./config/test.env mocha --exit",
+    "coverage": "c8 npm test && c8 report --reporter=lcov"
   },
   "keywords": [],
   "author": "",
