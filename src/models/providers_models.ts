@@ -1,8 +1,5 @@
 import { Document, model, Schema } from 'mongoose';
 
-// Esquema de la base de datos de proveedores
-
-
 /**
  * @brief Esquema de la base de datos de proveedores
  * id: Identificador del proveedor

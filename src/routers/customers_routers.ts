@@ -1,139 +1,152 @@
-/*
-import express, { Request, Response } from 'express';
-import { customerModel, ClienteInterface } from '../models/customers_models.js';
-import validator from 'validator';
+import express from 'express';
+import { Cliente, ClienteInterface } from '../models/customers_models.js';
 
-export const customersRouter = express.Router();
-*/
+export const customerRouter = express.Router();
+customerRouter.use(express.json());
+
+
 /**
  * Manejador para la creación de un nuevo cliente
  * @param {Object} req - Objeto de petición
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el cliente creado o un mensaje de error
  */
-/*
-customersRouter.post('/customers', async (req: Request, res: Response) => {
+customerRouter.post('/customers', async (req, res) => {
   try {
-    const cliente = new customerModel(req.body);
+    const duplicatedCliente = await Cliente.findOne({ dni: req.body.dni });
+    if (duplicatedCliente) {
+      return res.status(400).send({msg: 'Ya existe un cliente con ese dni'});
+    }
+    const cliente = new Cliente(req.body);
     await cliente.save();
-    res.status(201).send(cliente);
+    return res.status(201).send({ msg: 'El cliente se ha creado con éxito', Cliente: Cliente });
   } catch (error) {
-    res.status(400).send(error);
+    return res.status(400).send(error);
   }
 });
-*/
+
 /**
- * Manejador para leer un cliente en concreto por su nif
+ * Manejador para buscar un cliente en la base de datos a partir del dni
  * @param {Object} req - Objeto de petición
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el cliente encontrado o un mensaje de error
  */
-/*
-customersRouter.get('/customers/:nif', async (req: Request, res: Response) => {
+customerRouter.get('/customers', async (req, res) => {
   try {
-    const buscarCliente = await customerModel.findOne({ dni: req.params.nif });
-    if (!buscarCliente) {
-      res.status(404).send({ msg: 'No se encontró el cliente' });
-    } else {
-      res.status(200).send(buscarCliente);
+    const dni = req.query.dni;
+    if (!dni) {
+      return res.status(400).send({ msg: 'No se proporcionó un dni' });
     }
+    const clienteEncontrado: ClienteInterface | null = await Cliente.findOne({ dni: dni });
+    if (!clienteEncontrado) {
+      return res.status(404).send({ msg: 'El cliente no fue encontrado en la base de datos' });
+    }
+    return res.status(200).send({ msg: 'El cliente fue encontrado con éxito', Cliente: clienteEncontrado });
   } catch (error) {
-    res.status(500).send(error);
+    return res.status(500).send({ msg: 'Error al buscar el cliente', error: error });
+  }
+
+});
+
+/**
+ * Manejador para buscar un cliente por su identificador único
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con el cliente encontrado o un mensaje de error
+ */
+customerRouter.get('/customers/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const cliente = await Cliente.findById(id);
+    if (!cliente) {
+      return res.status(404).send({ msg: 'cliente no encontrado' });
+    }
+    return res.status(200).send({ msg: 'cliente encontrado por id con éxito', cliente: cliente });
+  } catch (error) {
+    return res.status(500).send({ msg: 'Error al buscar el cliente', error: error });
   }
 });
-*/
+
 /**
- * Actualiza un cliente de la base de datos haciendo uso de la QueryString.
+ * Manejador para actualizar un cliente por su identificador único
  * @param {Object} req - Objeto de petición
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el cliente actualizado o un mensaje de error
  */
-/*
-customersRouter.patch('/customers/:nif', async (req: Request, res: Response) => {
+customerRouter.patch('/customers/:id', async (req, res) => {
+  const id = req.params.id;
   try {
-    const clienteActualizado = await customerModel.findOneAndUpdate({ dni: req.params.nif }, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!clienteActualizado) {
-      res.status(404).json({ msg: 'No se encontró el cliente' });
-    } else {
-      res.status(200).send(clienteActualizado);
+    const updatedCliente = await Cliente.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updatedCliente) {
+      return res.status(404).send({ msg: 'cliente no encontrado' });
     }
+    return res.status(200).send({ msg: 'Se ha actualizado correctamente el cliente', Cliente: updatedCliente });
   } catch (error) {
-    res.status(500).send({ msg: 'Error al actualizar el cliente', error: error });
+    return res.status(500).send({ msg: 'Error al actualizar el cliente', error });
   }
 });
-*/
+
+
+
 /**
- * Actualiza un cliente de la base de datos haciendo uso del ID de manera dinámica
+ * Manejador para actualizar por dni un cliente de la base de datos haciendo uso de la QueryString
  * @param {Object} req - Objeto de petición
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el cliente actualizado o un mensaje de error
  */
-/*
-customersRouter.patch('/customers/:nif', async (req: Request, res: Response) => {
+customerRouter.patch('/customers', async (req, res) => {
+  const dni = req.query.dni;
+  if (!dni) {
+    return res.status(400).send({ msg: 'No se proporcionó un dni' });
+  }
   try {
-    const clienteActualizado = await customerModel.findByIdAndUpdate(req.params.nif, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!clienteActualizado) {
-      res.status(404).json({ msg: 'No se encontró el cliente' });
-    } else {
-      res.status(200).send(clienteActualizado);
+    const updatedCliente = await Cliente.findOneAndUpdate({ dni: dni }, req.body, { new: true });
+    if (!updatedCliente) {
+      return res.status(404).send({ msg: 'cliente no encontrado' });
     }
+    return res.status(200).send({ msg: 'Se ha actualizado correctamente el cliente', Cliente: updatedCliente });
   } catch (error) {
-    res.status(500).send({ msg: 'Error al actualizar el cliente', error: error });
+    return res.status(500).send({ msg: 'Error al actualizar el cliente', error });
   }
 });
-*/
+
 /**
- * Elimina un cliente de la base de datos haciendo uso de la QueryString o del identificador único
+ * Manejador para eliminar un cliente POR dni de la base de datos por dni haciendo uso de la QueryString
  * @param {Object} req - Objeto de petición
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el cliente eliminado o un mensaje de error
  */
-/*
-customersRouter.delete('/customers', async (req: Request, res: Response) => {
+customerRouter.delete('/customers', async (req, res) => {
+  const dni = req.query.dni;
+  if (!dni) {
+    return res.status(400).send({ msg: 'No se proporcionó un dni' });
+  }
   try {
-    const { nif, customerId } = req.query as { nif?: string; customerId?: string };
-    let clienteEliminado;
-
-    if (nif) {
-      clienteEliminado = await customerModel.findOneAndDelete({ dni: nif });
-    } else if (customerId) {
-      clienteEliminado = await customerModel.findByIdAndDelete(customerId);
-    } else {
-      return res.status(400).json({ message: 'Se requiere nif o customerId' });
+    const deletedCliente = await Cliente.findOneAndDelete({ dni: dni });
+    if (!deletedCliente) {
+      return res.status(404).send({ msg: 'cliente no encontrado' });
     }
-
-    if (!clienteEliminado) {
-      return res.status(404).json({ message: 'Cliente no encontrado' });
-    }
-
-    res.status(200).send(clienteEliminado);
+    return res.status(200).send({ msg: `cliente ${deletedCliente.nombre} eliminado con éxito`, Cliente: deletedCliente });
   } catch (error) {
-    res.status(500).send({ msg: 'Error al eliminar el cliente', error: error });
+    return res.status(500).send({ msg: 'Error al eliminar el cliente', error });
   }
 });
-*/
+
 /**
- * Elimina un cliente de la base de datos haciendo uso del ID de manera dinámica
+ * Manejador para eliminar un cliente por su identificador único
  * @param {Object} req - Objeto de petición
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el cliente eliminado o un mensaje de error
  */
-/*
-customersRouter.delete('/customers/:id', async (req: Request, res: Response) => {
-  try {
-    const clienteEliminado = await customerModel.findByIdAndDelete(req.params.id);
-    if (!clienteEliminado) {
-      return res.status(404).json({ msg: 'No se encontró el cliente' });
+customerRouter.delete('/customers/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+      const deletedCliente = await Cliente.findByIdAndDelete(id);
+      if (!deletedCliente) {
+        return res.status(404).send({ msg: 'cliente no encontrado' });
+      }
+      return res.status(200).send(deletedCliente);
+    } catch (error) {
+      return res.status(500).send({ msg: 'Error al eliminar el cliente', error });
     }
-    res.status(200).send(clienteEliminado);
-  } catch (error) {
-    res.status(500).send({ msg: 'Error al eliminar el cliente', error: error });
-  }
-});
-*/
+  });
