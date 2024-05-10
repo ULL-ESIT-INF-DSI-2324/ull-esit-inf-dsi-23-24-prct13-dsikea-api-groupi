@@ -1,5 +1,5 @@
 import { Document, connect, model, Schema } from 'mongoose';
-import { providerModel } from './providers_models.js';
+import { Provider } from './providers_models.js';
 import { customerModel } from './customers_models.js';
 import { muebleModel } from './furnitures_models.js';
 
@@ -40,7 +40,7 @@ Teniendo en cuenta todo lo anterior, como mínimo, tendrá que escribir un total
 export interface TransactionInterface extends Document {
   id: string;
   cliente: typeof customerModel;
-  proveedor: typeof providerModel;
+  proveedor: typeof Provider;
   muebles: (typeof muebleModel)[];
   fecha: Date;
   importe: number;
@@ -69,7 +69,7 @@ export const TransactionSchema = new Schema<TransactionInterface>({
     required: true,
   },
   proveedor: {
-    type: providerModel,
+    type: Provider,
     required: true,
   },
   muebles: {

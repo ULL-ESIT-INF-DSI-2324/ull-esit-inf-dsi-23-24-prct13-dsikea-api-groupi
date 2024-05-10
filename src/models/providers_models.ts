@@ -1,13 +1,7 @@
-import { Document, connect, model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
 // Esquema de la base de datos de proveedores
-connect('mongodb://127.0.0.1:27017/providers')
-  .then(() => {
-    console.log('Conectado a la base de datos');
-  })
-  .catch(() => {
-    console.log('Algo fallo al intentar conectarse a la base de datos de proveedores');
-  });
+
 
 /**
  * @brief Esquema de la base de datos de proveedores
@@ -79,4 +73,4 @@ export const ProviderSchema: Schema = new Schema<ProviderInterface>({
 });
 
 // Exportar el modelo de proveedores
-export const providerModel = model<ProviderInterface>('Provider', ProviderSchema);
+export const Provider = model<ProviderInterface>('Provider', ProviderSchema);

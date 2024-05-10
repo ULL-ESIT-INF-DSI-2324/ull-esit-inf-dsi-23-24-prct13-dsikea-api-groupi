@@ -1,6 +1,5 @@
 import express from 'express';
-import './db/mongoose.js';
-import { ProviderInterface, providerModel } from '../models/providers_models.js';
+import { ProviderInterface,  Provider } from '../models/providers_models.js';
 
 // objeto router que nos permite definir las rutas
 export const providerRouter = express.Router();
@@ -19,7 +18,7 @@ Teniendo en cuenta lo anterior, como mínimo, tendrá que escribir un total de s
  */
 providerRouter.post('/providers', async (req, res) => {
   try {
-    const provider = new providerModel(req.body);
+    const provider = new Provider(req.body);
     await provider.save();
     res.status(201).send(provider);
   } catch (error) {
@@ -36,7 +35,7 @@ providerRouter.post('/providers', async (req, res) => {
 providerRouter.get('/providers:cif', async (req, res) => {
   req.query = { ...req.query };
   try {
-    let proveedoresEncontrados: ProviderInterface[] = await providerModel.find(req.query);
+    let proveedoresEncontrados: ProviderInterface[] = await Provider.find(req.query);
     proveedoresEncontrados = proveedoresEncontrados.flat().filter((x) => x !== null);
     const condition: boolean = proveedoresEncontrados.length === 0;
     res
@@ -56,7 +55,7 @@ providerRouter.get('/providers:cif', async (req, res) => {
 providerRouter.patch('/providers/:cif', async (req, res) => {
     const cif = req.params.cif;
     try {
-        const updatedProvider = await providerModel.findOneAndUpdate({ cif }, req.body, { new: true });
+        const updatedProvider = await Provider.findOneAndUpdate({ cif }, req.body, { new: true });
         if (!updatedProvider) {
             return res.status(404).send({ msg: 'Proveedor no encontrado' });
         }
@@ -75,7 +74,7 @@ providerRouter.patch('/providers/:cif', async (req, res) => {
 providerRouter.delete('/providers/:cif', async (req, res) => {
   const cif = req.params.cif;
   try {
-    const deletedProvider = await providerModel.findOneAndDelete({ cif });
+    const deletedProvider = await Provider.findOneAndDelete({ cif });
     if (!deletedProvider) {
       return res.status(404).send({ msg: 'Proveedor no encontrado' });
     }
@@ -93,8 +92,8 @@ providerRouter.delete('/providers/:cif', async (req, res) => {
  */
 providerRouter.get('/providers', async (req, res) => {
   try {
-    const providers = await providerModel.find();
-    res.send(providers);
+    const providers = await Provider.find();
+    res.status(200).send(providers);
   } catch (error) {
     res.status(500).send({ msg: 'Error al listar los proveedores', error });
   }
@@ -109,7 +108,7 @@ providerRouter.get('/providers', async (req, res) => {
 providerRouter.get('/providers/:id', async (req, res) => {
     const id = req.params.id;
     try {
-      const provider = await providerModel.findById(id);
+      const provider = await Provider.findById(id);
       if (!provider) {
         return res.status(404).send({ msg: 'Proveedor no encontrado' });
       }
@@ -128,7 +127,7 @@ providerRouter.get('/providers/:id', async (req, res) => {
 providerRouter.delete('/providers/:id', async (req, res) => {
     const id = req.params.id;
     try {
-      const deletedProvider = await providerModel.findByIdAndDelete(id);
+      const deletedProvider = await Provider.findByIdAndDelete(id);
       if (!deletedProvider) {
         return res.status(404).send({ msg: 'Proveedor no encontrado' });
       }
