@@ -1,103 +1,116 @@
+/*
 import express from 'express';
-import './db/mongoose.js';
-//import { transactionModel, VentaSchema, ventaModel, CompraInterface, compraModel, CompraSchema } from '../models/transactions_models.js';
+import { Transaction } from '../models/transactions_models.js';
+import { Customer } from '../models/customers_models.js';
+import { Provider } from '../models/providers_models.js';
+import { Mueble } from '../models/furnitures_models.js';
+import { TuplaMueble } from '../models/transactions_models.js';
+import { Schema } from 'mongoose';
 
 export const transactionRouter = express.Router();
 transactionRouter.use(express.json());
+*/
+// Funciones previas a los manejadores
 
-// Ruta para obtener transacciones con parámetros de búsqueda opcionales
 /**
- * @summary Obtiene transacciones con parámetros de búsqueda opcionales
- * @param req Objeto de solicitud HTTP
- * @param res Objeto de respuesta HTTP
- * @returns JSON con las transacciones que coinciden con los parámetros de búsqueda o un error
+ * @brief Resetea la cantidad de muebles en una transacción, puede ser una compra o una venta
+ * @param transaction
+ * @param isPurchase
+ * @returns
  */
+
 /*
-furnitureRouter.get('/transactions', async (req: Request, res: Response) => {
-    try {
-      const query: any = {};
+async function adjustPurchase(transaction: TuplaMueble[], isPurchase: boolean) {
+    for (const item of transaction) {
+      const furnitureItem = await Mueble.findOneAndUpdate(
+        { _id: item.mueble },
+        { $inc: { cantidad: isPurchase ? -item.cantidad : item.cantidad } },
+        { new: true }
+      );
+      if (!furnitureItem) {
+        return { error: 'Mueble no encontrado' };
+      }
+    }
+  }
   
-      // Verificar si hay parámetros de consulta y agregarlos a la query
-      if (req.query.cliente) {
-        query.cliente = req.query.cliente;
-      }
-      if (req.query.proveedor) {
-        query.proveedor = req.query.proveedor;
-      }
-      if (req.query.fechaInicio && req.query.fechaFin) {
-        query.fecha = {
-          $gte: new Date(req.query.fechaInicio),
-          $lte: new Date(req.query.fechaFin),
+  // interfaz para representar los muebles en la transacción
+  interface MueblesTransaccion {
+    cantidad: number;
+    nombre: string;
+    material: string;
+    color: string;
+  }
+*/
+  /**
+   * @brief Busca los muebles en la base de datos y calcula el precio total de la transacción
+   * @param furniture
+   * @param isPurchase
+   * @returns
+   */
+
+  /*
+  async function fetchTransaction(muebles: MueblesTransaccion[]) {
+    let precioFinal: number = 0;
+    const buscarMueble: [Schema.Types.ObjectId, number][] = [];
+    for (const item of muebles) {
+      const buscarMuebleColor = await Mueble.findOneAndUpdate(
+        { name: item.nombre, material: item.material, color: item.color },
+        { $inc: { cantidad: item.cantidad } },
+        { new: true }
+      );
+      if (!buscarMuebleColor) {
+        return {
+          error: 'El mueble no fue encontrado',
+          muebles: buscarMueble,
         };
       }
-      // Agregar más campos según sea necesario
-  
-      const transactions = await transactionModel.find(query);
-      res.json(transactions);
-    } catch (error) {
-      res.status(500).json({ error: 'Error interno del servidor' });
+      precioFinal += buscarMuebleColor.precio * item.cantidad;
+      buscarMueble.push([buscarMuebleColor._id, item.cantidad]);
     }
+    return { muebles: buscarMueble, precioFinal: precioFinal };
+  }
+*/
+// manejadores
+
+/*
+transactionRouter.post('/transactions', async (req, res) => {
+  const { esCompra, clienteOProveedorId, muebles, fechaHora } = req.body;
+
+  // Verificar si es una compra o venta y buscar el cliente o proveedor correspondiente
+  const clienteOProveedor = esCompra
+    ? await Customer.findById(clienteOProveedorId)
+    : await Provider.findById(clienteOProveedorId);
+
+  if (!clienteOProveedor) {
+    return res.status(404).json({ error: 'Cliente o proveedor no encontrado' });
+  }
+
+  // Buscar los muebles y calcular el precio total
+  const transactionResult = await fetchTransaction(muebles);
+  if (transactionResult.error) {
+    return res.status(400).json({ error: transactionResult.error });
+  }
+
+  // Crear la transacción
+  const transaccion = new Transaction({
+    esCompra,
+    clienteOProveedor: clienteOProveedorId,
+    muebles: transactionResult.muebles,
+    fechaHora,
+    precioTotal: transactionResult.precioFinal,
   });
-  
-  // Ruta para obtener una transacción por su ID
-  /**
-   * @summary Obtiene una transacción por su ID
-   * @param req Objeto de solicitud HTTP
-   * @param res Objeto de respuesta HTTP
-   * @returns JSON con la transacción encontrada o un error si no se encuentra
-   */
-  /*
-  furnitureRouter.get('/transactions/:id', async (req: Request, res: Response) => {
-    try {
-      const transaction = await transactionModel.findById(req.params.id);
-      if (!transaction) {
-        res.status(404).json({ error: 'Transacción no encontrada' });
-      } else {
-        res.json(transaction);
-      }
-    } catch (error) {
-      res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  });
-  
-  // Ruta para actualizar una transacción por su ID
-  /**
-   * @summary Actualiza una transacción por su ID
-   * @param req Objeto de solicitud HTTP
-   * @param res Objeto de respuesta HTTP
-   * @returns JSON con la transacción actualizada o un error si no se encuentra
-   */
-  /*
-  furnitureRouter.put('/transactions/:id', async (req: Request, res: Response) => {
-    try {
-      const transaction = await transactionModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!transaction) {
-        res.status(404).json({ error: 'Transacción no encontrada' });
-      } else {
-        res.json(transaction);
-      }
-    } catch (error) {
-      res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  });   
-  // Ruta para eliminar una transacción por su ID
-  /**
-   * @summary Elimina una transacción por su ID
-   * @param req Objeto de solicitud HTTP
-   * @param res Objeto de respuesta HTTP
-   * @returns JSON con un mensaje de éxito o un error si no se encuentra la transacción
-   */
-  /*
-  furnitureRouter.delete('/transactions/:id', async (req: Request, res: Response) => {
-    try {
-      const transaction = await transactionModel.findByIdAndDelete(req.params.id);
-      if (!transaction) {
-        res.status(404).json({ error: 'Transacción no encontrada' });
-      } else {
-        res.json({ message: 'Transacción eliminada exitosamente' });
-      }
-    } catch (error) {
-      res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  });
-   */
+
+  // Guardar la transacción en la base de datos
+  const savedTransaccion = await transaccion.save();
+
+  // Ajustar la cantidad de muebles
+  const adjustResult = await adjustPurchase(transactionResult.muebles, esCompra);
+  if (adjustResult && adjustResult.error) {
+    return res.status(400).json({ error: adjustResult.error });
+  }
+
+  // Responder con la transacción guardada
+  res.json(savedTransaccion);
+});
+*/
+

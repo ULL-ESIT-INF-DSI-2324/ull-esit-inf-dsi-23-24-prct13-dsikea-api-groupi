@@ -6,13 +6,13 @@ export enum TipoMueble {
   Cama = 'Cama',
   Armario = 'Armario',
   Sofa = 'Sofa',
-  Estanteria = 'Estanteria'
+  Estanteria = 'Estanteria',
 }
 
 export enum MaterialMueble {
   Madera = 'Madera',
   Metal = 'Metal',
-  Plastico = 'Plastico'
+  Plastico = 'Plastico',
 }
 
 export enum ColorMueble {
@@ -22,9 +22,8 @@ export enum ColorMueble {
   Rojo = 'Rojo',
   Azul = 'Azul',
   Verde = 'Verde',
-  Naranja = 'Naranja'
+  Naranja = 'Naranja',
 }
-
 
 /**
  * @brief Interfaz para modelar un mueble
@@ -41,6 +40,7 @@ export interface MuebleInterface extends Document {
   descripcion: string;
   color: ColorMueble;
   precio: number;
+  cantidad: number;
 }
 
 export const MuebleSchema: Schema = new Schema<MuebleInterface>({
@@ -51,14 +51,14 @@ export const MuebleSchema: Schema = new Schema<MuebleInterface>({
       validator: (value: string) => {
         return value.length > 0;
       },
-      message: 'El nombre del mueble no puede ser vacío'
-    }
+      message: 'El nombre del mueble no puede ser vacío',
+    },
   },
   tipo: {
     type: String,
     enum: {
       values: Object.values(TipoMueble),
-      message: 'Ese tipo de mueble no está disponible en la tienda'
+      message: 'Ese tipo de mueble no está disponible en la tienda',
     },
     required: [true, 'El tipo del mueble es requerido'],
   },
@@ -66,7 +66,7 @@ export const MuebleSchema: Schema = new Schema<MuebleInterface>({
     type: String,
     enum: {
       values: Object.values(MaterialMueble),
-      message: 'Ese material no está disponible en la tienda'
+      message: 'Ese material no está disponible en la tienda',
     },
     required: [true, 'El material del mueble es requerido'],
   },
@@ -77,14 +77,24 @@ export const MuebleSchema: Schema = new Schema<MuebleInterface>({
       validator: (value: string) => {
         return value.length > 0;
       },
-      message: 'La descripción del mueble no puede ser vacía'
-    }
+      message: 'La descripción del mueble no puede ser vacía',
+    },
+  },
+  cantidad: {
+    type: Number,
+    required: [true, 'La cantidad del mueble es requerida'],
+    validate: {
+      validator: (value: number) => {
+        return value > 0;
+      },
+      message: 'La cantidad del mueble debe ser mayor que 0',
+    },
   },
   color: {
     type: String,
     enum: {
       values: Object.values(ColorMueble),
-      message: 'Ese color no está disponible en la tienda'
+      message: 'Ese color no está disponible en la tienda',
     },
     required: [true, 'El color del mueble es requerido'],
   },
@@ -95,8 +105,8 @@ export const MuebleSchema: Schema = new Schema<MuebleInterface>({
       validator: (value: number) => {
         return value > 0;
       },
-      message: 'El precio del mueble debe ser mayor que 0'
-    }
+      message: 'El precio del mueble debe ser mayor que 0',
+    },
   },
 });
 

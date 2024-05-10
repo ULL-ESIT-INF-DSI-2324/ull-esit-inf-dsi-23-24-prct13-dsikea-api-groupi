@@ -1,12 +1,8 @@
-
 Arrancar servidor descargado:
 `sudo /home/usuario/mongodb/bin/mongod --dbpath /home/usuario/mongodb-data/`
 
 Ejecutemos servidor;
 `mongosh`
-
-
-
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ULL-ESIT-INF-DSI-2324_ull-esit-inf-dsi-23-24-prct13-dsikea-api-groupi&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ULL-ESIT-INF-DSI-2324_ull-esit-inf-dsi-23-24-prct13-dsikea-api-groupi)
 

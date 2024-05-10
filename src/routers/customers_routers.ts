@@ -4,7 +4,6 @@ import { Cliente, ClienteInterface } from '../models/customers_models.js';
 export const customerRouter = express.Router();
 customerRouter.use(express.json());
 
-
 /**
  * Manejador para la creación de un nuevo cliente
  * @param {Object} req - Objeto de petición
@@ -15,7 +14,7 @@ customerRouter.post('/customers', async (req, res) => {
   try {
     const duplicatedCliente = await Cliente.findOne({ dni: req.body.dni });
     if (duplicatedCliente) {
-      return res.status(400).send({msg: 'Ya existe un cliente con ese dni'});
+      return res.status(400).send({ msg: 'Ya existe un cliente con ese dni' });
     }
     const cliente = new Cliente(req.body);
     await cliente.save();
@@ -45,7 +44,6 @@ customerRouter.get('/customers', async (req, res) => {
   } catch (error) {
     return res.status(500).send({ msg: 'Error al buscar el cliente', error: error });
   }
-
 });
 
 /**
@@ -85,8 +83,6 @@ customerRouter.patch('/customers/:id', async (req, res) => {
     return res.status(500).send({ msg: 'Error al actualizar el cliente', error });
   }
 });
-
-
 
 /**
  * Manejador para actualizar por dni un cliente de la base de datos haciendo uso de la QueryString
@@ -139,14 +135,14 @@ customerRouter.delete('/customers', async (req, res) => {
  * @returns {Object} - Objeto JSON con el cliente eliminado o un mensaje de error
  */
 customerRouter.delete('/customers/:id', async (req, res) => {
-    const id = req.params.id;
-    try {
-      const deletedCliente = await Cliente.findByIdAndDelete(id);
-      if (!deletedCliente) {
-        return res.status(404).send({ msg: 'cliente no encontrado' });
-      }
-      return res.status(200).send(deletedCliente);
-    } catch (error) {
-      return res.status(500).send({ msg: 'Error al eliminar el cliente', error });
+  const id = req.params.id;
+  try {
+    const deletedCliente = await Cliente.findByIdAndDelete(id);
+    if (!deletedCliente) {
+      return res.status(404).send({ msg: 'cliente no encontrado' });
     }
-  });
+    return res.status(200).send(deletedCliente);
+  } catch (error) {
+    return res.status(500).send({ msg: 'Error al eliminar el cliente', error });
+  }
+});

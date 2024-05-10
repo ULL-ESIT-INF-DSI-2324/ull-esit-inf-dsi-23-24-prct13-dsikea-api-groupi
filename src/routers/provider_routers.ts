@@ -1,5 +1,5 @@
 import express from 'express';
-import { ProviderInterface,  Provider } from '../models/providers_models.js';
+import { ProviderInterface, Provider } from '../models/providers_models.js';
 
 // objeto router que nos permite definir las rutas
 export const providerRouter = express.Router();
@@ -21,7 +21,7 @@ providerRouter.post('/providers', async (req, res) => {
   try {
     const duplicatedProvider = await Provider.findOne({ cif: req.body.cif });
     if (duplicatedProvider) {
-      return res.status(400).send({msg: 'Ya existe un proveedor con ese cif'});
+      return res.status(400).send({ msg: 'Ya existe un proveedor con ese cif' });
     }
     const provider = new Provider(req.body);
     await provider.save();
@@ -51,7 +51,6 @@ providerRouter.get('/providers', async (req, res) => {
   } catch (error) {
     return res.status(500).send({ msg: 'Error al buscar el proveedor', error: error });
   }
-
 });
 
 /**
@@ -91,8 +90,6 @@ providerRouter.patch('/providers/:id', async (req, res) => {
     return res.status(500).send({ msg: 'Error al actualizar el proveedor', error });
   }
 });
-
-
 
 /**
  * Manejador para actualizar por CIF un proveedor de la base de datos haciendo uso de la QueryString
@@ -145,14 +142,14 @@ providerRouter.delete('/providers', async (req, res) => {
  * @returns {Object} - Objeto JSON con el proveedor eliminado o un mensaje de error
  */
 providerRouter.delete('/providers/:id', async (req, res) => {
-    const id = req.params.id;
-    try {
-      const deletedProvider = await Provider.findByIdAndDelete(id);
-      if (!deletedProvider) {
-        return res.status(404).send({ msg: 'Proveedor no encontrado' });
-      }
-      return res.status(200).send(deletedProvider);
-    } catch (error) {
-      return res.status(500).send({ msg: 'Error al eliminar el proveedor', error });
+  const id = req.params.id;
+  try {
+    const deletedProvider = await Provider.findByIdAndDelete(id);
+    if (!deletedProvider) {
+      return res.status(404).send({ msg: 'Proveedor no encontrado' });
     }
-  });
+    return res.status(200).send(deletedProvider);
+  } catch (error) {
+    return res.status(500).send({ msg: 'Error al eliminar el proveedor', error });
+  }
+});
