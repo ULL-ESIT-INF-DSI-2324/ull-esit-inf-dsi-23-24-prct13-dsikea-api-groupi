@@ -1,159 +1,104 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema, model } from 'mongoose';
 
-
-type Furniture = {
-  alto: number;
-  ancho: number;
-  largo: number;
-};
-
-/**
- * @brief Interfaz de la base de datos de muebles
- */
-export interface FurnitureDocument extends Document {
-  id: string;
-  tipo_mueble: string;
-  nombre: string;
-  material_mueble: string;
-  descripcion_mueble: string;
-  precio: number;
-  cantidad: number;
-  dimesiones_mueble: Furniture;
-  color_mueble: string;
+export enum TipoMueble {
+  Silla = 'Silla',
+  Mesa = 'Mesa',
+  Cama = 'Cama',
+  Armario = 'Armario',
+  Sofa = 'Sofa',
+  Estanteria = 'Estanteria'
 }
 
-/**
- * @brief Esquema de la base de datos de muebles
- * @param id: string
- * @param tipo_mueble: string
- * @param nombre: string
- * @param material_mueble: string
- * @param descripcion_mueble: string
- * @param precio: number
- * @param cantidad: number
- * @param dimesiones_mueble: Furniture
- * @param color_mueble: string
- * @return FurnitureDocument
- * @throws Error si el id del mueble no es valido
- */
+export enum MaterialMueble {
+  Madera = 'Madera',
+  Metal = 'Metal',
+  Plastico = 'Plastico'
+}
 
-export const FurnitureSchema = new Schema<FurnitureDocument>({
-  id: {
-    type: String,
-    unique: true,
-    required: true,
-    lowercase: true,
-    validate: (value: string) => {
-      if (value.length < 0) {
-        throw new Error('El id del mueble no puede ser vacio');
-      }
-      if (value.length > 50) {
-        throw new Error('El id del mueble no puede tener mas de 50 caracteres');
-      }
-    },
-  },
-  tipo_mueble: {
-    type: String,
-    required: true,
-    lowercase: true,
-    validate: (value: string) => {
-      if (value.length < 0) {
-        throw new Error('El tipo de mueble no puede ser vacio');
-      }
-      if (value.length > 50) {
-        throw new Error('El tipo de mueble no puede tener mas de 50 caracteres');
-      }
-    },
-  },
+export enum ColorMueble {
+  Blanco = 'Blanco',
+  Negro = 'Negro',
+  Amarillo = 'Amarillo',
+  Rojo = 'Rojo',
+  Azul = 'Azul',
+  Verde = 'Verde',
+  Naranja = 'Naranja'
+}
+
+
+/**
+ * @brief Interfaz para modelar un mueble
+ * id: Identificador único del mueble
+ * nombre: Nombre del mueble
+ * tipo: Tipo del mueble (ej. silla, mesa, armario, etc.)
+ * material: Material del mueble (ej. madera, metal, plástico, etc.)
+ * precio: Precio del mueble
+ */
+export interface MuebleInterface extends Document {
+  nombre: string;
+  tipo: TipoMueble;
+  material: MaterialMueble;
+  descripcion: string;
+  color: ColorMueble;
+  precio: number;
+}
+
+export const MuebleSchema: Schema = new Schema<MuebleInterface>({
   nombre: {
     type: String,
-    required: true,
-    lowercase: true,
-    validate: (value: string) => {
-      if (value.length < 0) {
-        throw new Error('El nombre del mueble no puede ser vacio');
-      }
-      if (value.length > 50) {
-        throw new Error('El nombre del mueble no puede tener mas de 50 caracteres');
-      }
-    },
+    required: [true, 'El nombre del mueble es requerido'],
+    validate: {
+      validator: (value: string) => {
+        return value.length > 0;
+      },
+      message: 'El nombre del mueble no puede ser vacío'
+    }
   },
-  material_mueble: {
+  tipo: {
     type: String,
-    required: true,
-    lowercase: true,
-    enum: ['madera', 'plástico', 'metal', 'vidrio'],
-  },
-  descripcion_mueble: {
-    type: String,
-    required: true,
-    lowercase: true,
-    validate: (value: string) => {
-      if (value.length < 0) {
-        throw new Error('La descripcion del mueble no puede ser vacio');
-      }
-      if (!value.endsWith('.')) {
-        throw new Error('La descripcion del mueble debe terminar con un punto');
-      }
+    enum: {
+      values: Object.values(TipoMueble),
+      message: 'Ese tipo de mueble no está disponible en la tienda'
     },
+    required: [true, 'El tipo del mueble es requerido'],
+  },
+  material: {
+    type: String,
+    enum: {
+      values: Object.values(MaterialMueble),
+      message: 'Ese material no está disponible en la tienda'
+    },
+    required: [true, 'El material del mueble es requerido'],
+  },
+  descripcion: {
+    type: String,
+    required: [true, 'La descripción del mueble es requerida'],
+    validate: {
+      validator: (value: string) => {
+        return value.length > 0;
+      },
+      message: 'La descripción del mueble no puede ser vacía'
+    }
+  },
+  color: {
+    type: String,
+    enum: {
+      values: Object.values(ColorMueble),
+      message: 'Ese color no está disponible en la tienda'
+    },
+    required: [true, 'El color del mueble es requerido'],
   },
   precio: {
     type: Number,
-    required: true,
-    validate: (value: number) => {
-      if (value < 0) {
-        throw new Error('El precio del mueble no puede ser negativo');
-      }
-      if (/\d/.test(value.toString()) == false) {
-        throw new Error('El precio del mueble no puede contener letras');
-      }
-    },
-  },
-  cantidad: {
-    type: Number,
-    required: true,
-    validate: (value: number) => {
-      if (value < 0) {
-        throw new Error('La cantidad del mueble no puede ser negativa');
-      }
-      if (/\d/.test(value.toString()) == false) {
-        //si no es un numero
-        throw new Error('La cantidad del mueble no puede contener letras');
-      }
-    },
-  },
-  dimesiones_mueble: {
-    alto: {
-      type: Number,
-      required: true,
-      validate: (value: number) => {
-        if (value < 0) {
-          throw new Error('El alto del mueble no puede ser negativo');
-        }
+    required: [true, 'El precio del mueble es requerido'],
+    validate: {
+      validator: (value: number) => {
+        return value > 0;
       },
-    },
-    ancho: {
-      type: Number,
-      required: true,
-      validate: (value: number) => {
-        if (value < 0) {
-          throw new Error('El ancho del mueble no puede ser negativo');
-        }
-      },
-    },
-    largo: {
-      type: Number,
-      required: true,
-      validate: (value: number) => {
-        if (value < 0) {
-          throw new Error('El largo del mueble no puede ser negativo');
-        }
-      },
-    },
+      message: 'El precio del mueble debe ser mayor que 0'
+    }
   },
 });
 
-/**
- * Exportación de muebles
- */
-export const muebleModel = model<FurnitureDocument>('Muebles', FurnitureSchema);
+// Exportar el modelo de muebles
+export const Mueble = model<MuebleInterface>('Mueble', MuebleSchema);

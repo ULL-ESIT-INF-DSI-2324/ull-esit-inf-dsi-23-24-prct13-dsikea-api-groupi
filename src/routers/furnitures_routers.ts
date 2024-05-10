@@ -1,154 +1,154 @@
-import express, { Request, Response } from 'express';
-import { muebleModel /*FurnitureDocument*/ } from '../models/furnitures_models.js';
+import express from 'express';
+import { Mueble, ColorMueble, TipoMueble, MaterialMueble } from '../models/furnitures_models.js';
 
-interface QueryParams {
-  nombre?: string;
-  descripcion?: string;
-  color?: string;
-  // Agregar más campos según sea necesario
-}
 export const furnitureRouter = express.Router();
 furnitureRouter.use(express.json());
 
-// Ruta para crear un nuevo mueble
 /**
- * @summary Crea un nuevo mueble
- * @param req Objeto de solicitud HTTP
- * @param res Objeto de respuesta HTTP
- * @returns JSON con el nuevo mueble creado o un error
+ * Manejador para la creación de un nuevo proveedor
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con el proveedor creado o un mensaje de error
  */
-furnitureRouter.post('/muebles', async (req: Request, res: Response) => {
+furnitureRouter.post('/muebles', async (req, res) => {
+  const { color, tipo, material } = req.body;
+
+  if (!Object.values(ColorMueble).includes(color)) {
+    return res.status(400).send({ error: 'Ese color no está disponible en la tienda' });
+  }
+
+  if (!Object.values(TipoMueble).includes(tipo)) {
+    return res.status(400).send({ error: 'Ese tipo de mueble no está disponible en la tienda' });
+  }
+
+  if (!Object.values(MaterialMueble).includes(material)) {
+    return res.status(400).send({ error: 'Ese material no está disponible en la tienda' });
+  }
+
   try {
-    const nuevoMueble = await muebleModel.create(req.body);
-    res.status(201).json(nuevoMueble);
+    const mueble = new Mueble(req.body);
+    await mueble.save();
+    return res.status(201).send({ message: 'Mueble creado con éxito', mueble });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(500).send({ error: 'Error al crear el mueble' });
   }
 });
 
-// Ruta para obtener todos los muebles
 /**
- * @summary Obtiene todos los muebles
- * @param req Objeto de solicitud HTTP
- * @param res Objeto de respuesta HTTP
- * @returns JSON con todos los muebles o un error
+ * Manejador para buscar un mueble en la base de datos a partir de sus atributos
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con el mueble encontrado o un mensaje de error
  */
-furnitureRouter.get('/muebles', async (req: Request, res: Response) => {
+furnitureRouter.get('/muebles', async (req, res) => {
   try {
-    const muebles = await muebleModel.find();
-    res.json(muebles);
+    const muebles = await Mueble.find(req.query);
+    if (muebles.length === 0) {
+      return res.status(404).send({ message: 'No se encontraron muebles con los criterios de búsqueda proporcionados' });
+    }
+    return res.status(200).send({ message: 'Búsqueda realizada con éxito', muebles });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    return res.status(500).send({ error: 'Error al realizar la búsqueda' });
   }
 });
 
-// Ruta para obtener muebles con parámetros de búsqueda opcionales
 /**
- * @summary Obtiene muebles con parámetros de búsqueda opcionales
- * @param req Objeto de solicitud HTTP
- * @param res Objeto de respuesta HTTP
- * @returns JSON con los muebles que coinciden con los parámetros de búsqueda o un error
+ * Manejador para buscar un mueble por su identificador único
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con el mueble encontrado o un mensaje de error
  */
-furnitureRouter.get('/muebles', async (req: Request, res: Response) => {
+furnitureRouter.get('/muebles/:id', async (req, res) => {
+  const id = req.params.id;
   try {
-    const query: QueryParams = {};
-
-    // Verificar si hay parámetros de consulta y agregarlos a la query
-    if (req.query.nombre) {
-      query.nombre = req.query.nombre as string;
+    const muebles = await Mueble.findById(id);
+    if (!muebles) {
+      return res.status(404).send({ msg: 'mueble no encontrado' });
     }
-    if (req.query.descripcion) {
-      query.descripcion = req.query.descripcion as string;
-    }
-    if (req.query.color) {
-      query.color = req.query.color as string;
-    }
-    // Agregar más campos según sea necesario
-
-    const muebles = await muebleModel.find(query);
-    res.json(muebles);
+    return res.status(200).send({ msg: 'mueble encontrado por id con éxito', muebles: muebles });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    return res.status(500).send({ msg: 'Error al buscar el mueble', error: error });
   }
 });
 
-// Ruta para obtener un mueble por su ID
 /**
- * @summary Obtiene un mueble por su ID
- * @param req Objeto de solicitud HTTP
- * @param res Objeto de respuesta HTTP
- * @returns JSON con el mueble encontrado o un error si no se encuentra
+ * Manejador para modificar un mueble en la base de datos a partir de su nombre
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con el mueble modificado o un mensaje de error
  */
-furnitureRouter.get('/muebles/:id', async (req: Request, res: Response) => {
+furnitureRouter.patch('/muebles', async (req, res) => {
+  const nombre = req.query.nombre;
+  if (!nombre) {
+    return res.status(400).send({ message: 'No se proporcionó un nombre' });
+  }
   try {
-    const mueble = await muebleModel.findById(req.params.id);
+    const muebleActualizado = await Mueble.findOneAndUpdate({ nombre: nombre }, req.body, { new: true });
+    if (!muebleActualizado) {
+      return res.status(404).send({ message: 'Mueble no encontrado para modificar' });
+    }
+    return res.status(200).send({ message: 'Mueble modificado con éxito', mueble: muebleActualizado });
+  } catch (error) {
+    return res.status(500).send({ error: 'Error al modificar el mueble' });
+  }
+});
+
+/**
+ * Manejador para modificar un mueble por su identificador único
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con el mueble modificado o un mensaje de error
+ */
+furnitureRouter.patch('/muebles/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const mueble = await Mueble.findByIdAndUpdate(id, req.body, { new: true });
     if (!mueble) {
-      res.status(404).json({ error: 'Mueble no encontrado' });
-    } else {
-      res.json(mueble);
+      return res.status(404).send({ msg: 'Mueble no encontrado para modificar' });
     }
+    return res.status(200).send({ msg: 'Mueble modificado por id con éxito', mueble: mueble });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    return res.status(500).send({ msg: 'Error al modificar el mueble', error: error });
   }
 });
 
-// Ruta para actualizar un mueble por su ID
 /**
- * @summary Actualiza un mueble por su ID
- * @param req Objeto de solicitud HTTP
- * @param res Objeto de respuesta HTTP
- * @returns JSON con el mueble actualizado o un error si no se encuentra
+ * Manejador para eliminar un mueble en la base de datos a partir de su nombre
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con un mensaje de éxito o de error
  */
-furnitureRouter.put('/muebles/:id', async (req: Request, res: Response) => {
+furnitureRouter.delete('/muebles', async (req, res) => {
+  const nombre = req.query.nombre;
+  if (!nombre) {
+    return res.status(400).send({ message: 'No se proporcionó un nombre' });
+  }
   try {
-    const mueble = await muebleModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!mueble) {
-      res.status(404).json({ error: 'Mueble no encontrado' });
-    } else {
-      res.json(mueble);
+    const muebleEliminado = await Mueble.findOneAndDelete({ nombre: nombre });
+    if (!muebleEliminado) {
+      return res.status(404).send({ message: 'Mueble no encontrado para eliminar' });
     }
+    return res.status(200).send({ message: 'Mueble eliminado con éxito' });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    return res.status(500).send({ error: 'Error al eliminar el mueble' });
   }
 });
 
-// Ruta para eliminar un mueble por su ID
 /**
- * @summary Elimina un mueble por su ID
- * @param req Objeto de solicitud HTTP
- * @param res Objeto de respuesta HTTP
- * @returns JSON con un mensaje de éxito o un error si no se encuentra el mueble
+ * Manejador para eliminar un mueble por su identificador único
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con un mensaje de éxito o de error
  */
-furnitureRouter.delete('/muebles/:id', async (req: Request, res: Response) => {
+furnitureRouter.delete('/muebles/:id', async (req, res) => {
+  const id = req.params.id;
   try {
-    const mueble = await muebleModel.findByIdAndDelete(req.params.id);
-    if (!mueble) {
-      res.status(404).json({ error: 'Mueble no encontrado' });
-    } else {
-      res.json({ message: 'Mueble eliminado exitosamente' });
+    const muebleEliminado = await Mueble.findByIdAndDelete(id);
+    if (!muebleEliminado) {
+      return res.status(404).send({ msg: 'Mueble no encontrado para eliminar' });
     }
+    return res.status(200).send({ msg: 'Mueble eliminado por id con éxito' });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    return res.status(500).send({ msg: 'Error al eliminar el mueble', error: error });
   }
 });
-
-// Ruta para eliminar un mueble
-/**
- * @summary Elimina un mueble
- * @param req Objeto de solicitud HTTP
- * @param res Objeto de respuesta HTTP
- * @returns JSON con un mensaje de éxito o un error si no se encuentra el mueble
- */
-furnitureRouter.delete('/muebles', async (req: Request, res: Response) => {
-  try {
-    const mueble = await muebleModel.deleteMany(req.query);
-    if (!mueble) {
-      res.status(404).json({ error: 'Mueble no encontrado' });
-    } else {
-      res.json({ message: 'Mueble eliminado exitosamente' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
