@@ -1,13 +1,7 @@
-import { Document, connect, model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 import validator from 'validator';
 
-connect('mongodb://127.0.0.1:27017/customer')
-  .then(() => {
-    console.log('Conectado a la base de datos');
-  })
-  .catch(() => {
-    console.log('Algo salió mal al conectarse a la base de datos.');
-  });
+
 
 /**
  * @brief Esquema de la base de datos de cliente

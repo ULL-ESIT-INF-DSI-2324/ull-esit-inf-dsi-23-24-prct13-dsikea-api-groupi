@@ -3,6 +3,7 @@ import { ProviderInterface,  Provider } from '../models/providers_models.js';
 
 // objeto router que nos permite definir las rutas
 export const providerRouter = express.Router();
+providerRouter.use(express.json());
 
 /*
 La operación de lectura o consulta podrá llevarse a cabo de dos maneras diferentes: o bien utilizando una query string donde se consulte por el CIF del proveedor, o bien utilizando el identificador único del proveedor (el asignado por el sistema gestor de base de datos) como parámetro dinámico. Las operaciones de modificación y borrado de un proveedor también se podrán llevar a cabo de ambos modos.
@@ -18,31 +19,48 @@ Teniendo en cuenta lo anterior, como mínimo, tendrá que escribir un total de s
  */
 providerRouter.post('/providers', async (req, res) => {
   try {
+    const duplicatedProvider = await Provider.findOne({ cif: req.body.cif });
+    if (duplicatedProvider) {
+      return res.status(400).send({msg: 'Ya existe un proveedor con ese cif'});
+    }
     const provider = new Provider(req.body);
     await provider.save();
-    res.status(201).send(provider);
+    return res.status(201).send({ msg: 'El Proveedor se ha creado con éxito', provider: provider });
   } catch (error) {
-    res.status(400).send(error);
+    return res.status(400).send(error);
   }
 });
 
 /**
- * Manejador para buscar un proveedor en la base de datos a partir de la QueryString
+ * Manejador para buscar un proveedor en la base de datos a partir del cif
  * @param {Object} req - Objeto de petición
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el proveedor encontrado o un mensaje de error
  */
-providerRouter.get('/providers:cif', async (req, res) => {
-  req.query = { ...req.query };
+providerRouter.get('/providers/:cif', async (req, res) => {
   try {
-    let proveedoresEncontrados: ProviderInterface[] = await Provider.find(req.query);
-    proveedoresEncontrados = proveedoresEncontrados.flat().filter((x) => x !== null);
-    const condition: boolean = proveedoresEncontrados.length === 0;
-    res
-      .status(condition ? 404 : 200)
-      .send(condition ? { msg: 'El proveedor no fue encontrado en la base de datos' } : proveedoresEncontrados);
+    const proveedorEncontrado: ProviderInterface | null = await Provider.findOne({ cif: req.params.cif });
+    if (!proveedorEncontrado) {
+      return res.status(404).send({ msg: 'El proveedor no fue encontrado en la base de datos' });
+    }
+    return res.status(200).send({ msg: 'El proveedor fue encontrado con éxito', provider: proveedorEncontrado });
   } catch (error) {
-    res.status(500).send({ msg: 'Error al buscar el proveedor', error: error });
+    return res.status(500).send({ msg: 'Error al buscar el proveedor', error: error });
+  }
+});
+
+/**
+ * Manejador para listar todos los proveedores de la base de datos
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Objeto JSON con los proveedores encontrados o un mensaje de error
+ */
+providerRouter.get('/providers', async (req, res) => {
+  try {
+    const providers = await Provider.find();
+    res.status(200).send({ msg: 'Se han listado los proveedores con éxito', providers: providers });
+  } catch (error) {
+    res.status(500).send({ msg: 'Error al listar los proveedores', error });
   }
 });
 
@@ -53,16 +71,16 @@ providerRouter.get('/providers:cif', async (req, res) => {
  * @returns {Object} - Objeto JSON con el proveedor actualizado o un mensaje de error
  */
 providerRouter.patch('/providers/:cif', async (req, res) => {
-    const cif = req.params.cif;
-    try {
-        const updatedProvider = await Provider.findOneAndUpdate({ cif }, req.body, { new: true });
-        if (!updatedProvider) {
-            return res.status(404).send({ msg: 'Proveedor no encontrado' });
-        }
-        return res.status(200).send(updatedProvider);
-    } catch (error) {
-        return res.status(500).send({ msg: 'Error al actualizar el proveedor', error });
-    }
+  const cif = req.params.cif;
+  try {
+      const updatedProvider = await Provider.findOneAndUpdate({ cif }, req.body, { new: true });
+      if (!updatedProvider) {
+          return res.status(404).send({ msg: 'Proveedor no encontrado' });
+      }
+      return res.status(200).send({ msg: 'Se ha actualizado correctamente el proveedor', provider: updatedProvider });
+  } catch (error) {
+      return res.status(500).send({ msg: 'Error al actualizar el proveedor', error });
+  }
 });
 
 /**
@@ -78,26 +96,13 @@ providerRouter.delete('/providers/:cif', async (req, res) => {
     if (!deletedProvider) {
       return res.status(404).send({ msg: 'Proveedor no encontrado' });
     }
-    return res.status(200).send(deletedProvider);
+    return res.status(200).send({ msg: `Proveedor ${deletedProvider.nombre} eliminado con éxito`, provider: deletedProvider });
   } catch (error) {
     return res.status(500).send({ msg: 'Error al eliminar el proveedor', error });
   }
 });
 
-/**
- * Manejador para listar todos los proveedores de la base de datos
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- * @returns {Object} - Objeto JSON con los proveedores encontrados o un mensaje de error
- */
-providerRouter.get('/providers', async (req, res) => {
-  try {
-    const providers = await Provider.find();
-    res.status(200).send(providers);
-  } catch (error) {
-    res.status(500).send({ msg: 'Error al listar los proveedores', error });
-  }
-});
+
 
 /**
  * Manejador para buscar un proveedor por su identificador único

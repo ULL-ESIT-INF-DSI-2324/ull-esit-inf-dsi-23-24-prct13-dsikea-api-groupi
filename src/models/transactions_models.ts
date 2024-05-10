@@ -1,16 +1,9 @@
-import { Document, connect, model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 import { Provider } from './providers_models.js';
 import { customerModel } from './customers_models.js';
 import { muebleModel } from './furnitures_models.js';
 
-// Esquema de la base de datos de proveedores
-connect('mongodb://127.0.0.1:27017/providers')
-  .then(() => {
-    console.log('Conectado a la base de datos');
-  })
-  .catch(() => {
-    console.log('Algo fallo al intentar conectarse a la base de datos de proveedores');
-  });
+
 
 /*
 En la ruta /transactions del API, se deberá poder crear, leer, actualizar o borrar transacciones con clientes y/o proveedores.
