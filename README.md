@@ -12,7 +12,7 @@ Alumnas:
 # Informe
 
 ### Introducción
-En esta práctica grupal hay que aplicar todo lo aprendido relacionado con typescript y el entorno de ejecución `n`.
+En esta práctica grupal hay que aplicar todo lo aprendido relacionado con typescript y el entorno de ejecución `Node.js`.
 
 
 ### Objetivos a lograr realizando esta práctica
@@ -32,6 +32,7 @@ En esta práctica grupal hay que aplicar todo lo aprendido relacionado con types
 - [Apuntes Asignatura](https://campusingenieriaytecnologia2324.ull.es/mod/url/view.php?id=17339)
 - [Mongodb](https://www.mongodb.com/)
 - [Render](https://render.com/)
+- [Node.js](https://nodejs.org/en/)
 
 ---------------------------------------------------
 Arrancar servidor descargado:
