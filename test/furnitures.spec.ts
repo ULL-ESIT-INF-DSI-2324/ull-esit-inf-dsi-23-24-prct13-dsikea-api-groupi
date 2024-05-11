@@ -3,6 +3,7 @@ import { app } from '../src/server.js';
 import { Mueble } from '../src/models/furnitures_models.js';
 import { expect } from 'chai';
 
+
 // Pruebas para la creación de un nuevo mueble
 describe('POST /furnitures', () => {
   // Antes de cada prueba, limpiamos la base de datos

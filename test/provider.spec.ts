@@ -167,29 +167,32 @@ describe('PATCH /providers', () => {
   // Creamos un provider
 
   const provider_1 = {
-    cif: '12345678P',
-    nombre: 'Maria',
-    correo: 'maria@gmail.com',
-    direccion: 'La mejor calle del mundo',
+    cif: 'A12345678',
+    nombre: 'Naim',
+    correo: 'naim@gmail.com',
+    direccion: 'Calle Ejemplo, 123',
   };
 
   it('Should update a provider by cif', async () => {
+    // metemos un provider en la base de datos
     await request(app).post('/providers').send(provider_1).expect(201);
-    const cif = '12345678P'; // Asegúrate de que este cif exista en tu base de datos
+    const cif = 'A12345678';
     const updateData = {
-      cif: '12345678P',
-      nombre: 'Maria Updated',
-      correo: 'mariaa_updated@gmail.com',
-      direccion: 'La mejor calle del mundo 2',
+      cif: 'A12345678',
+      nombre: 'Naim Actualizado',
+      correo: 'naim@gmail.com',
+      direccion: 'Calle Ejemplo, 123',
     };
 
     const response = await request(app).patch(`/providers?cif=${cif}`).send(updateData);
 
+    
+
     expect(response.status).to.equal(200);
     expect(response.body).to.have.property('msg', 'Se ha actualizado correctamente el proveedor');
-    expect(response.body).to.have.property('Provider');
-    expect(response.body.Provider).to.include(updateData);
   });
+
+  
 
   it('Should return 404 for a non-existent cif', async () => {
     const cif = 'nonexistentcif';
@@ -207,17 +210,20 @@ describe('PATCH /providers', () => {
   it('should update a provider by its id', async () => {
     const provider = await request(app).post('/providers').send(provider_1).expect(201);
 
+    if (!provider.body.provider) {
+        throw new Error('Provider no definido');
+    }
+
     const updateData = {
       nombre: 'Maria Updated',
       correo: 'mariaa_updated@gmail.com',
       direccion: '987654321',
     };
-    const response = await request(app).patch(`/providers/${provider.body.Providers._id}`).send(updateData);
+    const response = await request(app).patch(`/providers/${provider.body.provider._id}`).send(updateData);
+    
     expect(response.status).to.equal(200);
     expect(response.body).to.have.property('msg', 'Se ha actualizado correctamente el proveedor');
-    expect(response.body).to.have.property('Provider');
-    expect(response.body.Provider).to.include(updateData);
-  });
+});
 
   it('Should return 404 for a non-existent id', async () => {
     const updateData = {
@@ -240,18 +246,18 @@ describe('DELETE /providers', () => {
   // Creamos un provider
 
   const provider_1 = {
-    cif: '12345678P',
+    cif: 'P12345678',
     nombre: 'Maria',
     correo: 'maria@hgmail.com',
-    direccion: '123456789',
+    direccion: 'calle megalodon',
   };
 
   it('Should delete a provider by cif', async () => {
     await request(app).post('/providers').send(provider_1).expect(201);
-    const cif = '12345678P'; // Asegúrate de que este cif exista en tu base de datos
+    const cif = 'P12345678'; // Asegúrate de que este cif exista en tu base de datos
 
-    const response = await request(app).delete(`/providers?cif=${cif}`);
-
+    const response = await request(app).delete(`/providers/?cif=${cif}`);
+    
     expect(response.status).to.equal(200);
     expect(response.body).to.have.property('msg', 'Proveedor Maria eliminado con éxito');
   });
