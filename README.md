@@ -164,7 +164,14 @@ Por último exportamos el esquema
 export const Cliente = model<ClienteInterface>('Cliente', ClienteSchema);
 ```
   ### Creación de notas
-  C
+  Creamos los manejadores que usaremos en la base datos, que lo creamos en otro directorio `src/routers`
+  Primero gestionamos las rutas, que se usará para manejar las solicitudes HTTP y después configuramos las solicitudes entrantes con datos en formato **JSON**: 
+  ```ts
+  export const customerRouter = express.Router();
+  customerRouter.use(express.json());
+  ```
+  Ahora empezamos a crear los distintos manejadores
+  
 
 ## Proveedores
 ## Muebles
