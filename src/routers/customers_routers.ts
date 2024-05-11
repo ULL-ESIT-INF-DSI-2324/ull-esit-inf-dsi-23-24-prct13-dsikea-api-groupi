@@ -18,7 +18,7 @@ customerRouter.post('/customers', async (req, res) => {
     }
     const cliente = new Cliente(req.body);
     await cliente.save();
-    return res.status(201).send({ msg: 'El cliente se ha creado con éxito', Cliente: Cliente });
+    return res.status(201).send({ msg: 'El cliente se ha creado con éxito', Cliente: cliente });
   } catch (error) {
     return res.status(400).send(error);
   }

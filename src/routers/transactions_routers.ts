@@ -41,14 +41,14 @@ async function adjustPurchase(transaction: TuplaMueble[], isPurchase: boolean) {
     color: string;
   }
 */
-  /**
-   * @brief Busca los muebles en la base de datos y calcula el precio total de la transacción
-   * @param furniture
-   * @param isPurchase
-   * @returns
-   */
+/**
+ * @brief Busca los muebles en la base de datos y calcula el precio total de la transacción
+ * @param furniture
+ * @param isPurchase
+ * @returns
+ */
 
-  /*
+/*
   async function fetchTransaction(muebles: MueblesTransaccion[]) {
     let precioFinal: number = 0;
     const buscarMueble: [Schema.Types.ObjectId, number][] = [];
@@ -113,4 +113,3 @@ transactionRouter.post('/transactions', async (req, res) => {
   res.json(savedTransaccion);
 });
 */
-

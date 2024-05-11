@@ -6,7 +6,7 @@ import { customerRouter } from './routers/customers_routers.js';
 import { providerRouter } from './routers/provider_routers.js';
 import { furnitureRouter } from './routers/furnitures_routers.js';
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || 3000;
 
 // Rutas
