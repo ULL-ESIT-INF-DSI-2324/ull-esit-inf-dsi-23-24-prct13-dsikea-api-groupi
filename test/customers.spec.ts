@@ -267,7 +267,6 @@ describe('DELETE /customers', () => {
     expect(response.body).to.have.property('msg', 'cliente no encontrado');
   });
 
-  
   it('should delete a customer by its id', async () => {
     const customer = await request(app).post('/customers').send(customer_1).expect(201);
 

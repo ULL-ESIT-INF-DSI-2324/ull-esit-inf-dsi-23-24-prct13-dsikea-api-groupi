@@ -186,13 +186,9 @@ describe('PATCH /providers', () => {
 
     const response = await request(app).patch(`/providers?cif=${cif}`).send(updateData);
 
-    
-
     expect(response.status).to.equal(200);
     expect(response.body).to.have.property('msg', 'Se ha actualizado correctamente el proveedor');
   });
-
-  
 
   it('Should return 404 for a non-existent cif', async () => {
     const cif = 'nonexistentcif';
@@ -211,7 +207,7 @@ describe('PATCH /providers', () => {
     const provider = await request(app).post('/providers').send(provider_1).expect(201);
 
     if (!provider.body.provider) {
-        throw new Error('Provider no definido');
+      throw new Error('Provider no definido');
     }
 
     const updateData = {
@@ -220,10 +216,10 @@ describe('PATCH /providers', () => {
       direccion: '987654321',
     };
     const response = await request(app).patch(`/providers/${provider.body.provider._id}`).send(updateData);
-    
+
     expect(response.status).to.equal(200);
     expect(response.body).to.have.property('msg', 'Se ha actualizado correctamente el proveedor');
-});
+  });
 
   it('Should return 404 for a non-existent id', async () => {
     const updateData = {
@@ -256,7 +252,7 @@ describe('DELETE /providers', () => {
     const cif = 'P12345678'; // Asegúrate de que este cif exista en tu base de datos
 
     const response = await request(app).delete(`/providers/?cif=${cif}`);
-    
+
     expect(response.status).to.equal(200);
     expect(response.body).to.have.property('msg', 'Proveedor Maria eliminado con éxito');
   });
@@ -286,4 +282,3 @@ describe('DELETE /providers', () => {
     expect(response.body).to.have.property('msg', 'Proveedor no encontrado');
   });
 });
-

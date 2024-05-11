@@ -10,7 +10,7 @@ furnitureRouter.use(express.json());
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el proveedor creado o un mensaje de error
  */
-furnitureRouter.post('/muebles', async (req, res) => {
+furnitureRouter.post('/furnitures', async (req, res) => {
   const { color, tipo, material } = req.body;
 
   if (!Object.values(ColorMueble).includes(color)) {
@@ -40,7 +40,7 @@ furnitureRouter.post('/muebles', async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el mueble encontrado o un mensaje de error
  */
-furnitureRouter.get('/muebles', async (req, res) => {
+furnitureRouter.get('/furnitures', async (req, res) => {
   try {
     const muebles = await Mueble.find(req.query);
     if (muebles.length === 0) {
@@ -58,7 +58,7 @@ furnitureRouter.get('/muebles', async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el mueble encontrado o un mensaje de error
  */
-furnitureRouter.get('/muebles/:id', async (req, res) => {
+furnitureRouter.get('/furnitures/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const muebles = await Mueble.findById(id);
@@ -77,7 +77,7 @@ furnitureRouter.get('/muebles/:id', async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el mueble modificado o un mensaje de error
  */
-furnitureRouter.patch('/muebles', async (req, res) => {
+furnitureRouter.patch('/furnitures', async (req, res) => {
   const nombre = req.query.nombre;
   if (!nombre) {
     return res.status(400).send({ message: 'No se proporcionó un nombre' });
@@ -99,7 +99,7 @@ furnitureRouter.patch('/muebles', async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con el mueble modificado o un mensaje de error
  */
-furnitureRouter.patch('/muebles/:id', async (req, res) => {
+furnitureRouter.patch('/furnitures/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const mueble = await Mueble.findByIdAndUpdate(id, req.body, { new: true });
@@ -118,7 +118,7 @@ furnitureRouter.patch('/muebles/:id', async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con un mensaje de éxito o de error
  */
-furnitureRouter.delete('/muebles', async (req, res) => {
+furnitureRouter.delete('/furnitures', async (req, res) => {
   const nombre = req.query.nombre;
   if (!nombre) {
     return res.status(400).send({ message: 'No se proporcionó un nombre' });
@@ -140,7 +140,7 @@ furnitureRouter.delete('/muebles', async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Objeto JSON con un mensaje de éxito o de error
  */
-furnitureRouter.delete('/muebles/:id', async (req, res) => {
+furnitureRouter.delete('/furnitures/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const muebleEliminado = await Mueble.findByIdAndDelete(id);

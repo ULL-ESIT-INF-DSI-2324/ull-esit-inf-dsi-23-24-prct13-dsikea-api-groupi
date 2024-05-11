@@ -53,10 +53,30 @@ export const TransactionSchema = new Schema<TransactionInterface>({
   cliente: {
     type: Schema.Types.ObjectId,
     ref: 'Cliente',
+    validate: {
+      validator: async function (value: string) {
+        if(value) {
+          const cliente = await model('Cliente').findById(value);
+          return cliente !== null;
+        }
+        return true;
+      },
+      message: 'El cliente no existe',
+    }
   },
   proveedor: {
     type: Schema.Types.ObjectId,
     ref: 'Proveedor',
+    validate: {
+      validator: async function (value: string) {
+        if (value) {
+          const proveedor = await model('Proveedor').findById(value);
+          return proveedor !== null;
+        }
+        return true; // Si no se especifica proveedor, no se valida
+      },
+      message: 'El proveedor especificado no existe',
+    },
   },
   fecha: {
     type: Date,

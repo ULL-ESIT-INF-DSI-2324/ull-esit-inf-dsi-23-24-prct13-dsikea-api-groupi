@@ -1,115 +1,136 @@
-/*
 import express from 'express';
 import { Transaction } from '../models/transactions_models.js';
-import { Customer } from '../models/customers_models.js';
-import { Provider } from '../models/providers_models.js';
+import { Cliente } from '../models/customers_models.js';
 import { Mueble } from '../models/furnitures_models.js';
-import { TuplaMueble } from '../models/transactions_models.js';
-import { Schema } from 'mongoose';
+import { Provider } from '../models/providers_models.js';
 
 export const transactionRouter = express.Router();
 transactionRouter.use(express.json());
-*/
-// Funciones previas a los manejadores
 
 /**
- * @brief Resetea la cantidad de muebles en una transacción, puede ser una compra o una venta
- * @param transaction
- * @param isPurchase
- * @returns
+ * Maneja la creación de una nueva transacción (compra o venta).
  */
+transactionRouter.post('/transaction', async (req, res) => {
+  try {
+    const { tipo, muebles, clienteID, provedorID, fecha } = req.body;
 
-/*
-async function adjustPurchase(transaction: TuplaMueble[], isPurchase: boolean) {
-    for (const item of transaction) {
-      const furnitureItem = await Mueble.findOneAndUpdate(
-        { _id: item.mueble },
-        { $inc: { cantidad: isPurchase ? -item.cantidad : item.cantidad } },
-        { new: true }
-      );
-      if (!furnitureItem) {
-        return { error: 'Mueble no encontrado' };
+
+     if (!tipo || !muebles || !fecha) {
+      return res.status(400).json({ msg: 'Faltan campos obligatorios' });
+     }
+
+     //return res.status(200).json({ msg: 'Transacción creada con éxito' });
+    // Verificar si el tipo de transacción es válido
+    if (tipo !== 'Compra' && tipo !== 'Venta') {
+      return res.status(400).json({ msg: 'Tipo de transacción no válido' });
+    }
+
+ 
+
+
+    // Verificar si se proporcionó el ID del proveedor ó cliente verificar si existe
+    let proveedor, cliente;
+    if (provedorID || clienteID) {
+      proveedor = await Provider.findById(provedorID);
+      cliente = await Cliente.findById(clienteID);
+
+      if (!proveedor || !cliente) {
+        return res.status(404).json({ error: 'El proveedor especificado no existe.' });
       }
     }
-  }
-  
-  // interfaz para representar los muebles en la transacción
-  interface MueblesTransaccion {
-    cantidad: number;
-    nombre: string;
-    material: string;
-    color: string;
-  }
-*/
-/**
- * @brief Busca los muebles en la base de datos y calcula el precio total de la transacción
- * @param furniture
- * @param isPurchase
- * @returns
- */
+    let totalPrice = 0;
 
-/*
-  async function fetchTransaction(muebles: MueblesTransaccion[]) {
-    let precioFinal: number = 0;
-    const buscarMueble: [Schema.Types.ObjectId, number][] = [];
-    for (const item of muebles) {
-      const buscarMuebleColor = await Mueble.findOneAndUpdate(
-        { name: item.nombre, material: item.material, color: item.color },
-        { $inc: { cantidad: item.cantidad } },
-        { new: true }
-      );
-      if (!buscarMuebleColor) {
-        return {
-          error: 'El mueble no fue encontrado',
-          muebles: buscarMueble,
-        };
+    if(tipo === 'Compra' && !proveedor) {
+
+    // Validar y obtener el precio total de la transacción
+    for (const muebleItem of muebles) {
+      
+      const mueble = await Mueble.findById(muebleItem.IDMueble);
+
+      if (!mueble) {
+        return res.status(400).json({ msg: `El mueble con ID ${muebleItem.IDMueble} no existe.` });
       }
-      precioFinal += buscarMuebleColor.precio * item.cantidad;
-      buscarMueble.push([buscarMuebleColor._id, item.cantidad]);
+
+      // si la cantidad de mueble en stock es menor a 0 no se puede realizar la transaccion
+      if (mueble.cantidad < muebleItem.cantidad) {
+        return res.status(400).json({ msg: `La cantidad de ${mueble.nombre} con ID: ${mueble._id} debe ser mayor a 0.` });
+      } 
+
+      // Restar la cantidad deseada del stock del mueble si hay suficiente cantidad disponible
+      const cantidadRestante = mueble.cantidad - muebleItem.cantidad;
+      if (cantidadRestante > 0) {
+        mueble.cantidad = cantidadRestante;
+        await mueble.save();
+
+        // si la cantidad de mueble en stock es 0 eliminar el mueble de la base de datos
+      } else if (cantidadRestante === 0) {
+        try {
+          const muebleEliminado = await Mueble.findByIdAndDelete(mueble._id);
+          if (!muebleEliminado) {
+            return res.status(400).json({ msg: `No se pudo eliminar el mueble con ID ${mueble._id}` });
+          }
+          return res.status(200).send({ msg: 'Mueble eliminado por id con éxito' });
+        } catch (error) {
+          return res.status(500).json({ error: 'Error al eliminar el mueble al ser 0' });
+        }
+      } else {
+        // Si la cantidad restante es cero o negativa, devuelve un mensaje de error
+        return res.status(400).json({ msg: `No se puede restar la cantidad especificada del mueble con ID ${muebleItem.IDMueble} = ${mueble.cantidad} - ${muebleItem.cantidad}` });
+      }
+
     }
-    return { muebles: buscarMueble, precioFinal: precioFinal };
+    // Calcular el precio total de la transacción
+    //console.log("Precio total:",totalPrice);
+    // Crear una nueva instancia de transacción con los datos proporcionados
+    const transaction = new Transaction({
+      tipo,
+      cliente: clienteID ? cliente : undefined,
+      proveedor: provedorID ? proveedor : undefined,
+      muebles,
+      fecha,
+      precio: totalPrice, // Calcular el precio total de la transacción
+    });
+    // Guardar la nueva transacción en la base de datos
+    await transaction.save();
+
+    // Enviar una respuesta con la transacción creada
+    return res.status(201).json(transaction);
+
+
+  } else if(tipo === 'Venta' && !cliente) {
+    // Validar y obtener el precio total de la transacción
+    
+      for (const muebleItem of muebles) {
+        const mueble = await Mueble.findById(muebleItem.IDMueble);
+        if (!mueble) {
+          return res.status(400).json({ msg: `El mueble con ID ${muebleItem.IDMueble} no existe.` });
+        }
+        const cantidad = muebleItem.cantidad;
+        const mueblePrice = cantidad * mueble.precio;
+        totalPrice += mueblePrice;
+      }
+        // Crear una nueva instancia de transacción con los datos proporcionados
+        const transaction = new Transaction({
+        tipo,
+        cliente: clienteID ? cliente : undefined,
+        proveedor: provedorID ? proveedor : undefined,
+        muebles,
+        fecha,
+        precio: totalPrice, // Calcular el precio total de la transacción
+    });
+
+    // Guardar la nueva transacción en la base de datos
+    await transaction.save();
+
+    // Enviar una respuesta con la transacción creada
+    return res.status(201).json(transaction);
+    } else {
+      return res.status(400).json({ msg: 'El cliente o proveedor no es necesario para una venta o compra respectivamente' });
+    }
+ 
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Error en el servidor' });
   }
-*/
-// manejadores
-
-/*
-transactionRouter.post('/transactions', async (req, res) => {
-  const { esCompra, clienteOProveedorId, muebles, fechaHora } = req.body;
-
-  // Verificar si es una compra o venta y buscar el cliente o proveedor correspondiente
-  const clienteOProveedor = esCompra
-    ? await Customer.findById(clienteOProveedorId)
-    : await Provider.findById(clienteOProveedorId);
-
-  if (!clienteOProveedor) {
-    return res.status(404).json({ error: 'Cliente o proveedor no encontrado' });
-  }
-
-  // Buscar los muebles y calcular el precio total
-  const transactionResult = await fetchTransaction(muebles);
-  if (transactionResult.error) {
-    return res.status(400).json({ error: transactionResult.error });
-  }
-
-  // Crear la transacción
-  const transaccion = new Transaction({
-    esCompra,
-    clienteOProveedor: clienteOProveedorId,
-    muebles: transactionResult.muebles,
-    fechaHora,
-    precioTotal: transactionResult.precioFinal,
-  });
-
-  // Guardar la transacción en la base de datos
-  const savedTransaccion = await transaccion.save();
-
-  // Ajustar la cantidad de muebles
-  const adjustResult = await adjustPurchase(transactionResult.muebles, esCompra);
-  if (adjustResult && adjustResult.error) {
-    return res.status(400).json({ error: adjustResult.error });
-  }
-
-  // Responder con la transacción guardada
-  res.json(savedTransaccion);
 });
-*/

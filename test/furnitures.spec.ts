@@ -2,7 +2,7 @@ import request from 'supertest';
 import { app } from '../src/server.js';
 import { TipoMueble, ColorMueble, MaterialMueble, Mueble } from '../src/models/furnitures_models.js';
 import { expect } from 'chai';
-
+import { beforeEach, describe, it } from 'node:test';
 
 // Pruebas para la creación de un nuevo mueble
 describe('POST /furnitures', () => {
@@ -21,7 +21,7 @@ describe('POST /furnitures', () => {
       cantidad: 10,
     };
 
-    const response = await request(app).post('/muebles').send(mueblePrueba).expect(201);
+    const response = await request(app).post('/furnitures').send(mueblePrueba).expect(201);
     expect(response.body).to.have.property('mueble');
     expect(response.body).to.have.property('msg', 'Mueble creado con éxito');
     expect(response.body.mueble).to.include(mueblePrueba);
@@ -37,8 +37,8 @@ describe('POST /furnitures', () => {
       precio: -10,
       cantidad: 0,
     };
-  
-    const response = await request(app).post('/muebles').send(furnitureData);
+
+    const response = await request(app).post('/furnitures').send(furnitureData);
     expect(response.status).to.equal(400);
   });
   it('Should not create a furniture with missing data', async () => {
@@ -50,8 +50,8 @@ describe('POST /furnitures', () => {
       precio: 100,
       cantidad: 10,
     };
-  
-    const response = await request(app).post('/muebles').send(furnitureData);
+
+    const response = await request(app).post('/furnitures').send(furnitureData);
     expect(response.status).to.equal(500);
   });
   it('Should not create a furnitute of an invalid color', async () => {
@@ -64,8 +64,8 @@ describe('POST /furnitures', () => {
       precio: 100,
       cantidad: 10,
     };
-  
-    const response = await request(app).post('/muebles').send(furnitureData);
+
+    const response = await request(app).post('/furnitures').send(furnitureData);
     expect(response.body).to.have.property('error', 'Ese color no está disponible en la tienda');
     expect(response.status).to.equal(400);
   });
@@ -79,12 +79,12 @@ describe('POST /furnitures', () => {
       precio: 100,
       cantidad: 10,
     };
-  
-    const response = await request(app).post('/muebles').send(furnitureData);
+
+    const response = await request(app).post('/furnitures').send(furnitureData);
     expect(response.body).to.have.property('error', 'Ese material no está disponible en la tienda');
     expect(response.status).to.equal(400);
   });
-  it ('should not create a furniture of an invalid type', async () => {
+  it('should not create a furniture of an invalid type', async () => {
     const furnitureData = {
       nombre: 'Silla Prueba',
       tipo: 'InvalidType',
@@ -94,12 +94,11 @@ describe('POST /furnitures', () => {
       precio: 100,
       cantidad: 10,
     };
-  
-    const response = await request(app).post('/muebles').send(furnitureData);
+
+    const response = await request(app).post('/furnitures').send(furnitureData);
     expect(response.body).to.have.property('error', 'Ese tipo de mueble no está disponible en la tienda');
     expect(response.status).to.equal(400);
   });
-  
 });
 
 describe('GET /furnitures', () => {
@@ -117,15 +116,15 @@ describe('GET /furnitures', () => {
       cantidad: 10,
     };
 
-    await request(app).post('/muebles').send(mueblePrueba).expect(201);
+    await request(app).post('/furnitures').send(mueblePrueba).expect(201);
 
-    const response = await request(app).get('/muebles').expect(200);
+    const response = await request(app).get('/furnitures').expect(200);
     expect(response.body).to.have.property('muebles');
     expect(response.body.muebles).to.have.length(1);
     expect(response.body.muebles[0]).to.include(mueblePrueba);
   });
   it('Should not find a furniture that is not in database', async () => {
-    const response = await request(app).get('/muebles').expect(404);
+    const response = await request(app).get('/furnitures').expect(404);
     expect(response.body).to.have.property('message', 'No se encontraron muebles con los criterios de búsqueda proporcionados');
   });
   it('Should find furniture by its id', async () => {
@@ -139,9 +138,9 @@ describe('GET /furnitures', () => {
       cantidad: 10,
     };
 
-    const mueble = await request(app).post('/muebles').send(mueblePrueba).expect(201);
-    const response = await request(app).get(`/muebles/${mueble.body.mueble._id}`).expect(200);
-   
+    const mueble = await request(app).post('/furnitures').send(mueblePrueba).expect(201);
+    const response = await request(app).get(`/furnitures/${mueble.body.mueble._id}`).expect(200);
+
     expect(response.body).to.have.property('muebles');
     expect(response.body).to.have.property('msg', 'Mueble encontrado con éxito');
     expect(response.body.muebles).to.include(mueblePrueba);
@@ -165,7 +164,7 @@ describe('PATCH /furnitures', () => {
       cantidad: 10,
     };
 
-    const mueble = await request(app).post('/muebles').send(mueblePrueba).expect(201);
+    const mueble = await request(app).post('/furnitures').send(mueblePrueba).expect(201);
 
     const muebleActualizado = {
       nombre: 'Silla Actualizada',
@@ -177,7 +176,7 @@ describe('PATCH /furnitures', () => {
       cantidad: 10,
     };
 
-    const response = await request(app).patch(`/muebles/${mueble.body.mueble._id}`).send(muebleActualizado).expect(200);
+    const response = await request(app).patch(`/furnitures/${mueble.body.mueble._id}`).send(muebleActualizado).expect(200);
     expect(response.body).to.have.property('mueble');
     expect(response.body).to.have.property('msg', 'Mueble modificado por id con éxito');
     expect(response.body.mueble).to.include(muebleActualizado);
@@ -193,7 +192,7 @@ describe('PATCH /furnitures', () => {
       cantidad: 10,
     };
 
-    const mueble = await request(app).post('/muebles').send(mueblePrueba).expect(201);
+    const mueble = await request(app).post('/furnitures').send(mueblePrueba).expect(201);
 
     const muebleActualizado = {
       nombre: 'Silla Actualizada',
@@ -205,7 +204,7 @@ describe('PATCH /furnitures', () => {
       cantidad: 10,
     };
 
-    const response = await request(app).patch(`/muebles/${mueble.body.mueble._id}`).send(muebleActualizado).expect(200);
+    const response = await request(app).patch(`/furnitures/${mueble.body.mueble._id}`).send(muebleActualizado).expect(200);
     expect(response.body).to.have.property('mueble');
     expect(response.body).to.have.property('msg', 'Mueble modificado por id con éxito');
     expect(response.body.mueble).to.include(muebleActualizado);
@@ -222,7 +221,7 @@ describe('PATCH /furnitures', () => {
       cantidad: 10,
     };
 
-    const response = await request(app).patch('/muebles?nombre=mueble no existente').send(muebleActualizado).expect(404);
+    const response = await request(app).patch('/furnitures?nombre=mueble no existente').send(muebleActualizado).expect(404);
     expect(response.body).to.have.property('msg', 'Mueble no encontrado para modificar');
   });
   // si no existe el mueble por id
@@ -237,7 +236,7 @@ describe('PATCH /furnitures', () => {
       cantidad: 10,
     };
 
-    const response = await request(app).patch('/muebles/1234').send(muebleActualizado).expect(500);
+    const response = await request(app).patch('/furnitures/1234').send(muebleActualizado).expect(500);
     expect(response.body).to.have.property('msg', 'Error al modificar el mueble');
   });
 });
@@ -258,12 +257,12 @@ describe('DELETE /furnitures', () => {
       cantidad: 10,
     };
 
-    const mueble = await request(app).post('/muebles').send(mueblePrueba).expect(201);
-    const response = await request(app).delete(`/muebles/${mueble.body.mueble._id}`).expect(200);
+    const mueble = await request(app).post('/furnitures').send(mueblePrueba).expect(201);
+    const response = await request(app).delete(`/furnitures/${mueble.body.mueble._id}`).expect(200);
     expect(response.body).to.have.property('msg', 'Mueble eliminado por id con éxito');
   });
   it('Should not delete a furniture by id that does not exist', async () => {
-    const response = await request(app).delete('/muebles/60b3b3b3b3b3b3b3b3b3b3b3').expect(404);
+    const response = await request(app).delete('/furnitures/60b3b3b3b3b3b3b3b3b3b3b3').expect(404);
     expect(response.body).to.have.property('msg', 'Mueble no encontrado para eliminar');
   });
   it('Should successfully delete a furniture by name', async () => {
@@ -277,12 +276,12 @@ describe('DELETE /furnitures', () => {
       cantidad: 10,
     };
 
-     await request(app).post('/muebles').send(mueblePrueba).expect(201);
-    const response = await request(app).delete(`/muebles?nombre=${mueblePrueba.nombre}`).expect(200);
+    await request(app).post('/furnitures').send(mueblePrueba).expect(201);
+    const response = await request(app).delete(`/furnitures?nombre=${mueblePrueba.nombre}`).expect(200);
     expect(response.body).to.have.property('msg', 'Mueble eliminado con éxito');
   });
   it('Should not delete a furniture by name that does not exist', async () => {
-    const response = await request(app).delete('/muebles?nombre=mueble no existente').expect(404);
+    const response = await request(app).delete('/furnitures?nombre=mueble no existente').expect(404);
     expect(response.body).to.have.property('msg', 'Mueble no encontrado para eliminar');
   });
 });
