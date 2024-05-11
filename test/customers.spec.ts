@@ -266,4 +266,21 @@ describe('DELETE /customers', () => {
     // mensaje
     expect(response.body).to.have.property('msg', 'cliente no encontrado');
   });
+
+  
+  it('should delete a customer by its id', async () => {
+    const customer = await request(app).post('/customers').send(customer_1).expect(201);
+
+    const response = await request(app).delete(`/customers/${customer.body.Cliente._id}`);
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.property('msg', 'Cliente eliminado con éxito');
+  });
+  it('Should return 404 for a non-existent id', async () => {
+    //const customer = await request(app).post('/customers').send(customer_1).expect(201);
+    const id_inexistente = '60b3b3b3b3b3b3b3b3b3b3b3';
+    const response = await request(app).delete(`/customers/${id_inexistente}`);
+
+    expect(response.status).to.equal(404);
+    expect(response.body).to.have.property('msg', 'cliente no encontrado');
+  });
 });

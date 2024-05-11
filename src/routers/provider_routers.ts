@@ -148,7 +148,7 @@ providerRouter.delete('/providers/:id', async (req, res) => {
     if (!deletedProvider) {
       return res.status(404).send({ msg: 'Proveedor no encontrado' });
     }
-    return res.status(200).send(deletedProvider);
+    return res.status(200).send({ msg: 'Proveedor eliminado con éxito', provider: deletedProvider });
   } catch (error) {
     return res.status(500).send({ msg: 'Error al eliminar el proveedor', error });
   }

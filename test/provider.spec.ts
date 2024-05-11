@@ -237,18 +237,17 @@ describe('PATCH /providers', () => {
     expect(response.status).to.equal(404);
   });
 });
-
 describe('DELETE /providers', () => {
   // Antes de cada prueba, limpiamos la base de datos
   beforeEach(async () => {
     await Provider.deleteMany({});
   });
-  // Creamos un provider
 
+  // Creamos un provider
   const provider_1 = {
     cif: 'P12345678',
     nombre: 'Maria',
-    correo: 'maria@hgmail.com',
+    correo: 'maria@gmail.com',
     direccion: 'calle megalodon',
   };
 
@@ -268,7 +267,23 @@ describe('DELETE /providers', () => {
     const response = await request(app).delete(`/providers?cif=${cif}`);
 
     expect(response.status).to.equal(404);
-    // mensaje
+    expect(response.body).to.have.property('msg', 'Proveedor no encontrado');
+  });
+
+  it('Should delete a provider by its id', async () => {
+    const provider = await request(app).post('/providers').send(provider_1).expect(201);
+
+    const response = await request(app).delete(`/providers/${provider.body.provider._id}`);
+    expect(response.status).to.equal(200);
+    expect(response.body).to.have.property('msg', 'Proveedor eliminado con éxito');
+  });
+
+  it('Should return 404 for a non-existent id', async () => {
+    const id_inexistente = '60b3b3b3b3b3b3b3b3b3b3b3';
+    const response = await request(app).delete(`/providers/${id_inexistente}`);
+
+    expect(response.status).to.equal(404);
     expect(response.body).to.have.property('msg', 'Proveedor no encontrado');
   });
 });
+

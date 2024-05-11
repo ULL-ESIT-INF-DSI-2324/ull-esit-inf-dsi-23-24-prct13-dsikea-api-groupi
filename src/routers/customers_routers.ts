@@ -141,7 +141,7 @@ customerRouter.delete('/customers/:id', async (req, res) => {
     if (!deletedCliente) {
       return res.status(404).send({ msg: 'cliente no encontrado' });
     }
-    return res.status(200).send(deletedCliente);
+    return res.status(200).send({ msg: 'Cliente eliminado con éxito', cliente: deletedCliente });
   } catch (error) {
     return res.status(500).send({ msg: 'Error al eliminar el cliente', error });
   }

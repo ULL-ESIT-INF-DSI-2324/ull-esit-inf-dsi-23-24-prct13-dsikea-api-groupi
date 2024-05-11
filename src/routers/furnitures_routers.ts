@@ -28,7 +28,7 @@ furnitureRouter.post('/muebles', async (req, res) => {
   try {
     const mueble = new Mueble(req.body);
     await mueble.save();
-    return res.status(201).send({ message: 'Mueble creado con éxito', mueble });
+    return res.status(201).send({ msg: 'Mueble creado con éxito', mueble });
   } catch (error) {
     return res.status(500).send({ error: 'Error al crear el mueble' });
   }
@@ -65,7 +65,7 @@ furnitureRouter.get('/muebles/:id', async (req, res) => {
     if (!muebles) {
       return res.status(404).send({ msg: 'mueble no encontrado' });
     }
-    return res.status(200).send({ msg: 'mueble encontrado por id con éxito', muebles: muebles });
+    return res.status(200).send({ msg: 'Mueble encontrado con éxito', muebles: muebles });
   } catch (error) {
     return res.status(500).send({ msg: 'Error al buscar el mueble', error: error });
   }
@@ -85,9 +85,9 @@ furnitureRouter.patch('/muebles', async (req, res) => {
   try {
     const muebleActualizado = await Mueble.findOneAndUpdate({ nombre: nombre }, req.body, { new: true });
     if (!muebleActualizado) {
-      return res.status(404).send({ message: 'Mueble no encontrado para modificar' });
+      return res.status(404).send({ msg: 'Mueble no encontrado para modificar' });
     }
-    return res.status(200).send({ message: 'Mueble modificado con éxito', mueble: muebleActualizado });
+    return res.status(200).send({ msg: 'Mueble modificado con éxito', mueble: muebleActualizado });
   } catch (error) {
     return res.status(500).send({ error: 'Error al modificar el mueble' });
   }
@@ -126,9 +126,9 @@ furnitureRouter.delete('/muebles', async (req, res) => {
   try {
     const muebleEliminado = await Mueble.findOneAndDelete({ nombre: nombre });
     if (!muebleEliminado) {
-      return res.status(404).send({ message: 'Mueble no encontrado para eliminar' });
+      return res.status(404).send({ msg: 'Mueble no encontrado para eliminar' });
     }
-    return res.status(200).send({ message: 'Mueble eliminado con éxito' });
+    return res.status(200).send({ msg: 'Mueble eliminado con éxito' });
   } catch (error) {
     return res.status(500).send({ error: 'Error al eliminar el mueble' });
   }
