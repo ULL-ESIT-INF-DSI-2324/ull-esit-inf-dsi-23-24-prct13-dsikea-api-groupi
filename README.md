@@ -12,6 +12,9 @@ Alumnas:
 
 [![Coverage Status](https://coveralls.io/repos/github/ULL-ESIT-INF-DSI-2324/ull-esit-inf-dsi-23-24-prct13-dsikea-api-groupi/badge.svg?branch=main)](https://coveralls.io/github/ULL-ESIT-INF-DSI-2324/ull-esit-inf-dsi-23-24-prct13-dsikea-api-groupi?branch=main)
 
+APLICACION ACCESIBLE A RENDER
+https://ull-esit-inf-dsi-23-24-prct13-dsikea-api-m8wa.onrender.com
+
 # Informe
 
 ### Introducción
@@ -85,7 +88,7 @@ Procesando disparadores para man-db (2.10.2-1) ...
 - Por último para ejecutar el servidor se usa el comando
 
 ```ts
-[~()]$mongosh
+[~()]$ node/dist/server.js
 ```
 
 ### Ejercicios y su explicación

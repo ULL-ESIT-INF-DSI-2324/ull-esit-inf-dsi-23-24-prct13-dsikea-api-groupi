@@ -1,7 +1,7 @@
 // server.ts
 import express from 'express';
 import './db/mongoose.js';
-
+import { Render } from './db/mongoose.js';
 import { customerRouter } from './routers/customers_routers.js';
 import { providerRouter } from './routers/provider_routers.js';
 import { furnitureRouter } from './routers/furnitures_routers.js';
@@ -22,3 +22,5 @@ app.use(defaultRouter);
 app.listen(port, () => {
   console.log(`Server is up on port ${port}`);
 });
+
+Render();
