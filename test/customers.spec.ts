@@ -3,6 +3,7 @@ import { app } from '../src/server.js';
 import { Cliente } from '../src/models/customers_models.js';
 import { expect } from 'chai';
 
+
 // Pruebas para la creación de un nuevo cliente
 describe('POST /customers', () => {
   // Antes de cada prueba, limpiamos la base de datos

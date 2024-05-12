@@ -9,7 +9,7 @@ import { MuebleSchema } from './furnitures_models.js';
  * cantidad: Cantidad de muebles que se van a comprar o vender
  */
 export interface TuplaMueble {
-  mueble: typeof MuebleSchema;
+  _id: typeof MuebleSchema;
   cantidad: number;
 }
 
@@ -39,7 +39,7 @@ export const TransactionSchema = new Schema<TransactionInterface>({
   },
   muebles: [
     {
-      mueble: {
+      _id: {
         type: Schema.Types.ObjectId,
         ref: 'Mueble',
         required: true,
@@ -66,11 +66,11 @@ export const TransactionSchema = new Schema<TransactionInterface>({
   },
   proveedor: {
     type: Schema.Types.ObjectId,
-    ref: 'Proveedor',
+    ref: 'Provider',
     validate: {
       validator: async function (value: string) {
         if (value) {
-          const proveedor = await model('Proveedor').findById(value);
+          const proveedor = await model('Provider').findById(value);
           return proveedor !== null;
         }
         return true; // Si no se especifica proveedor, no se valida

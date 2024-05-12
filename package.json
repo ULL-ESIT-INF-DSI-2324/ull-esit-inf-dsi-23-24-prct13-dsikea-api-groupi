@@ -11,7 +11,7 @@
     "test": "mocha --exit",
     "coverage": "c8 npm test && c8 report --reporter=lcov",
     "doc": "typedoc --out docs src/**/*.ts; touch docs/.nojekyll",
-    "server": "tsc; node dist/server.js &"
+    "server": "tsc| node dist/server.js &"
   },
   "keywords": [],
   "author": "Inés Garrote, Ángela Izquierdo, Godgift Jonh",

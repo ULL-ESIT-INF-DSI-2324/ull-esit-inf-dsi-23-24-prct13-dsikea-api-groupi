@@ -2,7 +2,8 @@ import request from 'supertest';
 import { app } from '../src/server.js';
 import { TipoMueble, ColorMueble, MaterialMueble, Mueble } from '../src/models/furnitures_models.js';
 import { expect } from 'chai';
-import { beforeEach, describe, it } from 'node:test';
+
+
 
 // Pruebas para la creación de un nuevo mueble
 describe('POST /furnitures', () => {

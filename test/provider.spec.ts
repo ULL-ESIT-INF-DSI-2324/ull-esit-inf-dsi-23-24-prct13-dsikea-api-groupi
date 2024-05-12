@@ -3,6 +3,7 @@ import { app } from '../src/server.js';
 import { Provider } from '../src/models/providers_models.js';
 import { expect } from 'chai';
 
+
 // Pruebas para la creación de un nuevo provider
 describe('POST /providers', () => {
   // Antes de cada prueba, limpiamos la base de datos
