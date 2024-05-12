@@ -1277,6 +1277,7 @@ app.listen(port, () => {
 
 ### Dificultades
 Esta práctica grupal fue todo un reto. Desde decidir qué validadores usar en los esquemas hasta entender los errores cuando las solicitudes fallaban, cada paso requería atención cuidadosa. Usar ThunderClient para probar las rutas fue útil, pero asegurarse de que estuvieran bien formateadas era clave. Además, con las pruebas asíncronas, era importante evitar que una afectara a otra. En resumen, fue un proceso que demandó atención a los detalles y comprensión de los conceptos subyacentes.
+
 ### Bibliografía
 
 - [Apuntes Asignatura](https://campusingenieriaytecnologia2324.ull.es/mod/url/view.php?id=17339)
