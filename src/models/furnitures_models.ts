@@ -1,5 +1,8 @@
 import { Document, Schema, model } from 'mongoose';
 
+/**
+ * @brief Enumeración de los tipos de muebles disponibles en la tienda
+ */
 export enum TipoMueble {
   Silla = 'Silla',
   Mesa = 'Mesa',
@@ -9,12 +12,18 @@ export enum TipoMueble {
   Estanteria = 'Estanteria',
 }
 
+/**
+ * @brief Enumeración de los materiales de los muebles disponibles en la tienda
+ */
 export enum MaterialMueble {
   Madera = 'Madera',
   Metal = 'Metal',
   Plastico = 'Plastico',
 }
 
+/**
+ * @brief Enumeración de los colores de los muebles disponibles en la tienda
+ */
 export enum ColorMueble {
   Blanco = 'Blanco',
   Negro = 'Negro',
@@ -43,6 +52,9 @@ export interface MuebleInterface extends Document {
   cantidad: number;
 }
 
+/**
+ * @brief Esquema de la coleccción de muebles
+ */
 export const MuebleSchema: Schema = new Schema<MuebleInterface>({
   nombre: {
     type: String,

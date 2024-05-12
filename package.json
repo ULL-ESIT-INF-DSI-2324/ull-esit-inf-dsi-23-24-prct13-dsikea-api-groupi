@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsc-watch --onSuccess \"env-cmd -f ./config/dev.env node dist/server.js\"",
+    "peticion": "tsc-watch --onSuccess \"env-cmd -f ./config/casual.env node dist/src/server.js.js\"",
     "test": "env-cmd -f ./config/test.env mocha --exit",
     "coverage": "c8 npm test && c8 report --reporter=lcov",
     "doc": "typedoc --out docs src/**/*.ts; touch docs/.nojekyll",

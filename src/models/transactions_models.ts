@@ -25,12 +25,15 @@ export interface TuplaMueble {
 export interface TransactionInterface extends Document {
   tipo: 'Compra' | 'Venta';
   muebles: TuplaMueble[];
-  proveedor?: typeof ProviderSchema;
-  cliente?: typeof ClienteSchema;
+  proveedor?: typeof ProviderSchema; // referencia a la colección de proveedores
+  cliente?: typeof ClienteSchema; // referencia a la colección de clientes
   fecha: Date;
   precio: number;
 }
 
+/**
+ * @brief Esquema de la colección de transacciones
+ */
 export const TransactionSchema = new Schema<TransactionInterface>({
   tipo: {
     type: String,
