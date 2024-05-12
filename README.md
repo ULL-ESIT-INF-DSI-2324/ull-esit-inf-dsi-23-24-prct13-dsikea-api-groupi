@@ -211,15 +211,14 @@ customerRouter.use(express.json());
 
 Ahora empezamos a crear los distintos manejadores:
 
-1. Crear un nuevo cliente `POST /customers_models`:
+### 1. Crear un nuevo cliente `POST /customers_models`:
 
    - Este manejador recibe una solicitud **POST** en la ruta `/customers_models`.
    - Primero busca si ya existe un cliente con el mismo DNI en la base de datos.
    - Si encuentra un cliente duplicado, devuelve un mensaje de error.
    - Si no hay un cliente duplicado, crea un nuevo cliente con los datos proporcionados en el cuerpo de la solicitud.
    - Guarda el cliente en la base de datos y devuelve un mensaje de éxito junto con el cliente creado en caso de éxito, o un mensaje de error en caso de fallo
-
-   ```ts
+```ts
    customerRouter.post('/customers', async (req, res) => {
    try {
      const duplicatedCliente = await Cliente.findOne({ dni: req.body.dni });
@@ -228,24 +227,19 @@ Ahora empezamos a crear los distintos manejadores:
      }
      const cliente = new Cliente(req.body);
      await cliente.save();
-     return res.status(201).send({ msg: 'El cliente se ha creado con éxito', Cliente: cliente });
+     return res.status(201).send({ msg: 'El cliente se ha creado con éxito', Cliente: cliente  });
    } catch (error) {
      return res.status(400).send(error);
    }
-   ```
+   });
+```
 
-});
-
-````
-
-2. Buscar un cliente por DNI `GET /customers`:
-
-
-    - Este manejador recibe una solicitud GET en la ruta /customers.
-    - Busca un cliente en la base de datos basándose en el DNI proporcionado en la consulta.
-    - Si no se proporciona un DNI, devuelve un mensaje de error.
-    - Si no se encuentra un cliente con el DNI proporcionado, devuelve un mensaje de cliente no encontrado.
-    - Si se encuentra un cliente, devuelve un mensaje de éxito junto con el cliente encontrado.
+### 2. Buscar un cliente por DNI `GET /customers`:  
+  - Este manejador recibe una solicitud GET en la ruta /customers.
+   - Busca un cliente en la base de datos basándose en el DNI proporcionado en la consulta.
+   - Si no se proporciona un DNI, devuelve un mensaje de error.
+   - Si no se encuentra un cliente con el DNI proporcionado, devuelve un mensaje de cliente no encontrado.
+   - Si se encuentra un cliente, devuelve un mensaje de éxito junto con el cliente encontrado.
     ```ts
     customerRouter.get('/customers', async (req, res) => {
     try {
@@ -261,18 +255,15 @@ Ahora empezamos a crear los distintos manejadores:
     } catch (error) {
       return res.status(500).send({ msg: 'Error al buscar el cliente', error: error });
     }
+    });
+    ```
 
-});
-````
-
-3. Buscar un cliente por su identificador único `GET /customers/:id`:
-
+### 3. Buscar un cliente por su identificador único `GET /customers/:id`:  
    - Este manejador recibe una solicitud GET en la ruta /customers/:id, donde :id es el identificador único del cliente.
    - Busca un cliente en la base de datos basándose en su identificador único.
    - Si no se encuentra un cliente con el ID proporcionado, devuelve un mensaje de cliente no encontrado.
    - Si se encuentra un cliente, devuelve un mensaje de éxito junto con el cliente encontrado.
-
-   ```ts
+```ts
    customerRouter.get('/customers/:id', async (req, res) => {
      const id = req.params.id;
      try {
@@ -285,16 +276,14 @@ Ahora empezamos a crear los distintos manejadores:
        return res.status(500).send({ msg: 'Error al buscar el cliente', error: error });
      }
    });
-   ```
+```
 
-4. Actualizar un cliente por su identificador único `PATCH /customers/:id`:
-
+### 4. Actualizar un cliente por su identificador único `PATCH /customers/:id`:  
    - Este manejador recibe una solicitud PATCH en la ruta /customers/:id, donde :id es el identificador único del cliente que se desea actualizar.
    - Actualiza el cliente en la base de datos con los datos proporcionados en el cuerpo de la solicitud.
    - Si no se encuentra un cliente con el ID proporcionado, devuelve un mensaje de cliente no encontrado.
    - Si se actualiza correctamente el cliente, devuelve un mensaje de éxito junto con el cliente actualizado.
-
-   ```ts
+```ts
    customerRouter.patch('/customers/:id', async (req, res) => {
      const id = req.params.id;
      try {
@@ -307,17 +296,15 @@ Ahora empezamos a crear los distintos manejadores:
        return res.status(500).send({ msg: 'Error al actualizar el cliente', error });
      }
    });
-   ```
+```
 
-5. Actualizar un cliente por DNI `PATCH /customers`:
-
+### 5. Actualizar un cliente por DNI `PATCH /customers`:  
    - Este manejador recibe una solicitud PATCH en la ruta /customers.
    - Actualiza el cliente en la base de datos con los datos proporcionados en el cuerpo de la solicitud, basándose en el DNI proporcionado en la consulta.
    - Si no se proporciona un DNI, devuelve un mensaje de error.
    - Si no se encuentra un cliente con el DNI proporcionado, devuelve un mensaje de cliente no encontrado.
    - Si se actualiza correctamente el cliente, devuelve un mensaje de éxito junto con el cliente actualizado.
-
-   ```ts
+```ts
    customerRouter.patch('/customers', async (req, res) => {
    const dni = req.query.dni;
    if (!dni) {
@@ -332,21 +319,15 @@ Ahora empezamos a crear los distintos manejadores:
    } catch (error) {
      return res.status(500).send({ msg: 'Error al actualizar el cliente', error });
    }
-   ```
+```
 
-});
-
-````
-
-6. Eliminar un cliente por DNI `DELETE /customers`:
-
-
-    - Este manejador recibe una solicitud DELETE en la ruta /customers.
-    - Elimina el cliente de la base de datos basándose en el DNI proporcionado en la consulta.
-    - Si no se proporciona un DNI, devuelve un mensaje de error.
-    - Si no se encuentra un cliente con el DNI proporcionado, devuelve un mensaje de cliente no encontrado.
-    - Si se elimina correctamente el cliente, devuelve un mensaje de éxito junto con el cliente eliminado.
-    ```ts
+### 6. Eliminar un cliente por DNI `DELETE /customers`:  
+   - Este manejador recibe una solicitud DELETE en la ruta /customers.
+   - Elimina el cliente de la base de datos basándose en el DNI proporcionado en la consulta.
+   - Si no se proporciona un DNI, devuelve un mensaje de error.
+   - Si no se encuentra un cliente con el DNI proporcionado, devuelve un mensaje de cliente no encontrado.
+   - Si se elimina correctamente el cliente, devuelve un mensaje de éxito junto con el cliente eliminado.
+ ```ts
     customerRouter.delete('/customers', async (req, res) => {
     const dni = req.query.dni;
     if (!dni) {
@@ -361,17 +342,14 @@ Ahora empezamos a crear los distintos manejadores:
     } catch (error) {
       return res.status(500).send({ msg: 'Error al eliminar el cliente', error });
     }
+    });
+ ```
 
-});
-````
-
-7. Eliminar un cliente por su identificador único `DELETE /customers:id`:
-
+### 7. Eliminar un cliente por su identificador único `DELETE /customers:id`:  
    - Este manejador recibe una solicitud DELETE en la ruta /customers/:id, donde :id es el identificador único del cliente que se desea eliminar.
    - Elimina el cliente de la base de datos basándose en su identificador único.
    - Si no se encuentra un cliente con el ID proporcionado, devuelve un mensaje de cliente no encontrado.
    - Si se elimina correctamente el cliente, devuelve un mensaje de éxito junto con el cliente eliminado.
-
    ```ts
    customerRouter.delete('/customers/:id', async (req, res) => {
    const id = req.params.id;
@@ -384,11 +362,9 @@ Ahora empezamos a crear los distintos manejadores:
    } catch (error) {
      return res.status(500).send({ msg: 'Error al eliminar el cliente', error });
    }
-   ```
+  });
 
-});
-
-````
+  ```
 
 ## Proveedores
 
@@ -475,7 +451,7 @@ export const Provider = model<ProviderInterface>('Provider', ProviderSchema);
 
 Que se encuentra en nuestro directorio `src/providers_models`
 
-1. Crear un nuevo proveedor `POST /providers_models`:
+### 1. Crear un nuevo proveedor `POST /providers_models`:
 
    - Este manejador recibe una solicitud POST en la ruta /providers_models.
    - Crea un nuevo proveedor en la base de datos.
@@ -498,7 +474,7 @@ Que se encuentra en nuestro directorio `src/providers_models`
    });
    ```
 
-2. Buscar un proveedor por CIF `GET /providers_models`:
+### 2. Buscar un proveedor por CIF `GET /providers_models`:
 
    - Este manejador recibe una solicitud GET en la ruta /providers_models.
    - Busca un proveedor en la base de datos basándose en el CIF proporcionado en la consulta.
@@ -524,7 +500,7 @@ Que se encuentra en nuestro directorio `src/providers_models`
    });
    ```
 
-3. Buscar un proveedor por su identificador único `GET /providers_models/:id`:
+### 3. Buscar un proveedor por su identificador único `GET /providers_models/:id`:
 
    - Este manejador recibe una solicitud GET en la ruta /providers_models/:id, donde :id es el identificador único del proveedor.
    - Busca un proveedor en la base de datos basándose en su identificador único.
@@ -546,7 +522,7 @@ Que se encuentra en nuestro directorio `src/providers_models`
    });
    ```
 
-4. Actualizar un proveedor por su identificador único `PATCH /providers_models/:id`:
+### 4. Actualizar un proveedor por su identificador único `PATCH /providers_models/:id`:
 
    - Este manejador recibe una solicitud PATCH en la ruta /providers_models/:id, donde :id es el identificador único del proveedor que se desea actualizar.
    - Actualiza el proveedor en la base de datos basándose en su identificador único.
@@ -568,7 +544,7 @@ Que se encuentra en nuestro directorio `src/providers_models`
    });
    ```
 
-5. Actualizar un proveedor por CIF `PATCH /providers_models`:
+### 5. Actualizar un proveedor por CIF `PATCH /providers_models`:
 
    - Este manejador recibe una solicitud PATCH en la ruta /providers_models.
    - Actualiza un proveedor en la base de datos basándose en el CIF proporcionado en la consulta.
@@ -594,7 +570,7 @@ Que se encuentra en nuestro directorio `src/providers_models`
    });
    ```
 
-6. Eliminar un proveedor por CIF `DELETE /providers_models`:
+### 6. Eliminar un proveedor por CIF `DELETE /providers_models`:
 
    - Este manejador recibe una solicitud DELETE en la ruta /providers_models.
    - Elimina un proveedor de la base de datos basándose en el CIF proporcionado en la consulta.
@@ -620,7 +596,7 @@ Que se encuentra en nuestro directorio `src/providers_models`
    });
    ```
 
-7. Eliminar un proveedor por su identificador único `DELETE /providers_models/:id`:
+### 7. Eliminar un proveedor por su identificador único `DELETE /providers_models/:id`:
    - Este manejador recibe una solicitud DELETE en la ruta /providers_models/:id, donde :id es el identificador único del proveedor que se desea eliminar.
    - Elimina un proveedor de la base de datos basándose en su identificador único.
    - Si el proveedor no se encuentra en la base de datos, devuelve un mensaje de proveedor no encontrado.
@@ -937,8 +913,337 @@ Que se encuentra en nuestro directorio `src/furnitures_models`
    ```
 
 ## Transacciones
+Primer definimos el esquema de los clientes, que lo guardamos en nuestro directorio `transactions_models`.
+```ts
+export interface TuplaMueble {
+  _id: typeof MuebleSchema;
+  cantidad: number;
+}
+export interface TransactionInterface extends Document {
+  tipo: 'Compra' | 'Venta';
+  muebles: TuplaMueble[];
+  proveedor?: typeof ProviderSchema; // referencia a la colección de proveedores
+  cliente?: typeof ClienteSchema; // referencia a la colección de clientes
+  fecha: Date;
+  precio: number;
+}
+```
+Creamos una interfaz que hereda de `Document`, así definimos la forma de una **nota**(es la colección que se le pasa a MongoDB), en el nuestro cliente tendrá esos atributos.
 
-+++++++++++++++++++++++++++++
+Ahora definimos las propiedades que tendrá nuestro esquema:
+En el especificamos las validaciones:
+```ts
+export const TransactionSchema = new Schema<TransactionInterface>({
+  tipo: {
+    type: String,
+    enum: ['Compra', 'Venta'],
+    required: true,
+  },
+  muebles: [
+    {
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Mueble',
+        required: true,
+      },
+      cantidad: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
+  cliente: {
+    type: Schema.Types.ObjectId,
+    ref: 'Cliente',
+    validate: {
+      validator: async function (value: string) {
+        if(value) {
+          const cliente = await model('Cliente').findById(value);
+          return cliente !== null;
+        }
+        return true;
+      },
+      message: 'El cliente no existe',
+    }
+  },
+  proveedor: {
+    type: Schema.Types.ObjectId,
+    ref: 'Provider',
+    validate: {
+      validator: async function (value: string) {
+        if (value) {
+          const proveedor = await model('Provider').findById(value);
+          return proveedor !== null;
+        }
+        return true; // Si no se especifica proveedor, no se valida
+      },
+      message: 'El proveedor especificado no existe',
+    },
+  },
+  fecha: {
+    type: Date,
+    required: true,
+  },
+  precio: {
+    type: Number,
+    required: true,
+  },
+});
+```
+
+- El `type` será `String`
+- Usamos `validate` para comprobar si el esquema esta bien definido o no, en caso de que la propiedad no este puesto en el formato que pusimos, lanzará un un mensaje de error o sino cumple con la longitud correspondiente, etc.  
+  Por último exportamos el esquema
+
+```ts
+export const Transaction = model<TransactionInterface>('Transaction', TransactionSchema);
+```
+
+### Creación de notas
+
+Que se encuentra en nuestro directorio `src/furnitures_models`
+
+## Transacciones
+
+### 1. Crear una Nueva Transacción (`POST /transactions`):
+
+- Este manejador recibe una solicitud POST en la ruta `/transactions`.
+- Verifica si se proporcionan los campos obligatorios: tipo, muebles y fecha.
+- Valida el tipo de transacción (Compra o Venta).
+- Verifica si se proporcionó el ID del proveedor o cliente y comprueba si existen en la base de datos.
+- Actualiza el stock de los muebles en la base de datos según el tipo de transacción.
+- Calcula el precio total de la transacción.
+- Crea una nueva instancia de transacción con los datos proporcionados.
+- Guarda la nueva transacción en la base de datos.
+- Retorna un mensaje de éxito junto con la transacción creada.
+```ts
+transactionRouter.post('/transactions', async (req, res) => {
+  try {
+    if (req.body.tipo === 'Venta' && req.body.clienteID === undefined ||
+      req.body.tipo === 'Compra' && req.body.proveedorID === undefined ||
+      req.body.muebles === undefined) {
+      res.status(400).send({ msg: 'Faltan campos obligatorios' });
+    }
+    if (req.body.tipo === 'Venta') {
+      const cliente = await Cliente.findById( req.body.clienteID );
+      if (!cliente) {
+        return res.status(404).send({ msg: 'El cliente especificado no existe.' });
+      }
+      const tipo = req.body.tipo;
+      await Actualizarstock(req.body.muebles, tipo);
+      const transformarMuebles = await Creararraymuebles(req.body.muebles);
+      const precio_importe = await calculateAmount(req.body.muebles);
+      const transaction = new Transaction({
+        tipo: tipo,
+        muebles: transformarMuebles,
+        cliente,
+        fecha: new Date(),
+        precio: precio_importe,
+      });
+      await transaction.save();
+      return res.status(201).send({ msg: ' Transacion de venta completada'  });
+    } else if (req.body.tipo === 'Compra') {
+      const proveedor = await Provider.findById( req.body.proveedorID );
+      if (!proveedor) {
+        return res.status(404).send({ msg: 'El proveedor especificado no existe.' });
+      }
+      const tipo = req.body.tipo;
+      await Actualizarstock(req.body.muebles, tipo);
+      const transformarMuebles = await Creararraymuebles(req.body.muebles);
+      const precio_importe = await calculateAmount(req.body.muebles);
+      const transaction = new Transaction({
+        tipo: tipo,
+        muebles: transformarMuebles,
+        proveedor,
+        fecha: new Date(),
+        precio: precio_importe,
+      });
+      await transaction.save();
+      return res.status(201).send({ msg: "Transacion de compra completada" });
+    }
+    return res.status(500).send({ msg: '1. Error en el servidor' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ msg: '2. Error en el servidor' });
+  }
+});
+```
+
+### 2. Obtener Todas las Transacciones de un Cliente (`GET /transactions/cliente`):
+
+- Este manejador recibe una solicitud GET en la ruta `/transactions/cliente`.
+- Busca un cliente en la base de datos basándose en su identificador único (DNI).
+- Si el cliente no se encuentra, devuelve un mensaje de error.
+- Busca todas las transacciones asociadas al cliente.
+- Si no se encuentran transacciones para el cliente, devuelve un mensaje de error.
+- Retorna un objeto JSON con las transacciones encontradas.
+```ts
+transactionRouter.get('/transactions/cliente', async (req, res) => {
+  const  dnicliente = req.query.dni; // Obtener el ID de la transacción de los parámetros de la ruta
+	try {
+		const cliente = await Cliente.findOne({ dni: dnicliente });
+    if (!cliente) {
+      return res.status(400).send({ msg: "No existe cliente con este DNI" });
+    } 
+    const transaccion = await Transaction.find({ cliente: cliente });
+		if (!transaccion) {
+      return res.status(404).send("Transaccion no encontrada");
+    }
+		return res.status(200).send(transaccion);
+	} catch (error) {
+		return res.status(500).send({ msg: "Error al realizar esta transaccion" });
+	}
+});
+```
+
+### 3. Obtener Todas las Transacciones de un Proveedor (`GET /transactions/proveedor`):
+
+- Este manejador recibe una solicitud GET en la ruta `/transactions/proveedor`.
+- Busca un proveedor en la base de datos basándose en su identificador único (CIF).
+- Si el proveedor no se encuentra, devuelve un mensaje de error.
+- Busca todas las transacciones asociadas al proveedor.
+- Si no se encuentran transacciones para el proveedor, devuelve un mensaje de error.
+- Retorna un objeto JSON con las transacciones encontradas.
+```ts
+transactionRouter.get('/transactions/proveedor', async (req, res) => {
+  const cif_peticion = req.query.cif; // Obtener el ID de la transacción de los parámetros de la ruta
+	try {
+		const provider = await Provider.findOne({ cif: cif_peticion });
+		if (!provider) {
+			return res.status(404).send({ msg: ' Provedor no encontrado por lo que transaccion no existe' });
+		}
+		const transaccion = await Transaction.find({ proveedor: provider });
+		if (transaccion) {
+      return res.status(200).send(transaccion);
+      
+		}
+    return res.status(404).send({ msg: ' Transaccion no encontrada' });
+	} catch (error) {
+		return res.status(500).send({ msg: 'Error al consultar transacción' });
+	}
+});
+```
+
+### 4. Obtener una Transacción por su ID (`GET /transactions/:id`):
+
+- Este manejador recibe una solicitud GET en la ruta `/transactions/:id`, donde `:id` es el identificador único de la transacción.
+- Busca una transacción en la base de datos basándose en su identificador único.
+- Si la transacción no se encuentra, devuelve un mensaje de error.
+- Retorna un objeto JSON con la transacción encontrada.
+```ts
+transactionRouter.get('/transactions/:id', async (req, res) => {
+  const transaccionId = req.params.id; // Obtener el ID de la transacción de los parámetros de la ruta
+  try {
+    // Buscar la transacción por su ID
+    const transacciones = await Transaction.findById(transaccionId);
+    // Verificar si la transacción existe
+    if (!transacciones) {
+      return res.status(404).send({ msg: 'La transacción no fue encontrada' });
+    }
+    // Devolver la transacción encontrada
+    return res.status(200).send(transacciones);
+  }
+  catch (error) {
+    return res.status(500).send({ msg: 'Error al obtener la transacción'});
+  }
+}); 
+```
+
+### 5. Eliminar una Transacción por su ID (`DELETE /transactions/:id`):
+
+- Este manejador recibe una solicitud DELETE en la ruta `/transactions/:id`, donde `:id` es el identificador único de la transacción que se desea eliminar.
+- Busca la transacción por su ID.
+- Si la transacción no se encuentra, devuelve un mensaje de error.
+- Elimina la transacción de la base de datos.
+- Retorna un mensaje de éxito.
+```ts
+transactionRouter.delete('/transactions/:id', async (req, res) => {
+  try {
+    const transaccionId = req.params.id; // Obtener el ID de la transacción de los parámetros de la ruta
+    // Buscar la transacción por su ID
+    const transacciones = await Transaction.findById(transaccionId);
+
+    // Verificar si la transacción existe
+    if (!transacciones) {
+      return res.status(404).send({ msg: 'La transacción no fue encontrada' });
+    }
+
+    // Eliminar la transacción de la base de datos
+    try {
+      const eliminartransaccion = await Transaction.findByIdAndDelete(transaccionId);
+      if (!eliminartransaccion) {
+        return res.status(404).send({ msg: 'Transacción no encontrada para eliminar' });
+      }
+    } catch (error) {
+      return res.status(500).send({ msg: 'Error al eliminar la transaccion' });
+    }
+    
+    return res.status(200).send({ msg:'Transacción eliminada correctamente' });
+
+  } catch (error) {
+    return res.status(500).send({ msg: 'Error al eliminar la transacción:', error});
+  }
+});
+```
+
+### 6. Actualizar una Transacción por su ID (`PATCH /transactions/:id`):
+
+- Este manejador recibe una solicitud PATCH en la ruta `/transactions/:id`, donde `:id` es el identificador único de la transacción que se desea actualizar.
+- Busca la transacción por su ID.
+- Si la transacción no se encuentra, devuelve un mensaje de error.
+- Actualiza la transacción en la base de datos con los datos proporcionados.
+- Retorna un objeto JSON con la transacción actualizada o un mensaje de error.
+```ts
+transactionRouter.patch('/transactions/:id', async (req, res) => {
+  try {
+    const transaccionId = req.params.id; // Obtener el ID de la transacción de los parámetros de la ruta
+    // Verificar si la transacción existe
+    const transacciones = await Transaction.findById(transaccionId);
+    if (!transacciones) {
+      return res.status(404).send({ msg: 'La transacción no fue encontrada' });
+    }
+    const mueble = await Creararraymuebles(req.body.muebles); // Se crea la tupla de Mueble
+    if(mueble){
+      await Actualizarstock(mueble, transacciones.tipo); // Se comprueba que los muebles existen y demás y se actualiza
+    }
+    
+    if (req.body.tipo === 'Venta' && req.body.clienteID === undefined ||
+      req.body.tipo === 'Compra' && req.body.proveedorID === undefined) {
+      res.status(400).send({ msg: 'Falta el campo tipo o clienteID o proveedorID dependiendo del tipo compra ó venta' });
+    }
+
+    // Verificar si el array de muebles tiene al menos un elemento
+    if (!req.body.muebles || req.body.muebles.length === 0) {
+      return res.status(400).send({ msg: 'Se requiere al menos un mueble' });
+    }
+
+    const precio_importe = await calculateAmount(req.body.muebles);
+    // Actualizar la transacción
+    const actualizarTransaccion = await Transaction.findByIdAndUpdate(
+      req.params.id, // Buscar la transacción por su ID
+      { $set: req.body, fecha: new Date(), precio: precio_importe,  }, // Actualizar el cuerpo de la transacción y el precio
+      { new: true } // Devolver la transacción actualizada
+    );    
+    if(actualizarTransaccion){ // Verificar si la transacción fue actualizada
+      return res.send(actualizarTransaccion);
+    }
+    return res.status(404).send({ msg: 'Transacción no encontrada' });
+  } catch (error) {
+    return res.status(500).send( {msg: `Error al actualizar la transacción:`, error});
+  } 
+});
+```
+
+Usamos tres funciones para facilitar ciertos cálculos, actualizaciones del stock y facilitar mejor los muebles:
+
+### Función calculateAmount  
+Esta función calcula el importe total de una transacción a partir de una lista de muebles proporcionada. Itera sobre cada mueble en la lista, busca el mueble en la base de datos por su ID y suma el precio del mueble multiplicado por la cantidad solicitada. Finalmente, devuelve el importe total de la transacción.
+
+### Función Actualizarstock  
+Esta función actualiza el stock de los muebles en la base de datos según el tipo de transacción (Venta o Compra) y la lista de muebles proporcionada. Si la transacción es de venta, disminuye el stock del mueble en la cantidad especificada. Si es de compra, aumenta el stock del mueble en la cantidad especificada. Lanza errores si no encuentra un mueble en la base de datos o si el stock disponible es insuficiente para realizar la transacción.
+
+### Función Creararraymuebles  
+Esta función crea pares de identificadores de muebles y cantidad a partir de una lista de muebles proporcionada. Recorre la lista de muebles, busca cada mueble en la base de datos por su ID y crea un par con el identificador del mueble y la cantidad especificada. Luego, devuelve una matriz de estos pares. Lanza un error si no encuentra un mueble en la base de datos.
 
 ## Server
 Aqui se hace la configuración del servidor, usando Express.js para el API REST
@@ -971,7 +1276,7 @@ app.listen(port, () => {
 ```
 
 ### Dificultades
-
+Esta práctica grupal fue todo un reto. Desde decidir qué validadores usar en los esquemas hasta entender los errores cuando las solicitudes fallaban, cada paso requería atención cuidadosa. Usar ThunderClient para probar las rutas fue útil, pero asegurarse de que estuvieran bien formateadas era clave. Además, con las pruebas asíncronas, era importante evitar que una afectara a otra. En resumen, fue un proceso que demandó atención a los detalles y comprensión de los conceptos subyacentes.
 ### Bibliografía
 
 - [Apuntes Asignatura](https://campusingenieriaytecnologia2324.ull.es/mod/url/view.php?id=17339)
